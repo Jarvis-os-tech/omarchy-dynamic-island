@@ -583,7 +583,7 @@ Item {
             var raw = parseInt(brightnessFile.text(), 10);
             if (isNaN(raw))
                 return;
-            var level = Model.clamp01(raw / root.brightnessMax);
+            var level = Model.clampBrightness(raw / root.brightnessMax);
             var previous = root.brightness;
             root.brightness = level;
             if (previous < 0 || Math.abs(level - previous) < 0.001 || !root.ready)
@@ -593,7 +593,7 @@ Item {
                 layout: "progress",
                 icon: Model.brightnessIcon(level),
                 value: level,
-                valueText: Math.round(level * 100) + "%",
+                valueText: Math.max(1, Math.min(100, Math.round(level * 100))) + "%",
                 color: root.fg,
                 duration: 1500
             });
@@ -603,7 +603,8 @@ Item {
     Process {
         id: brightnessSetProcess
         onExited: {
-            var target = Math.round(root.brightness * 100) + "%";
+            var pct = Math.max(1, Math.min(100, Math.round(root.brightness * 100)));
+            var target = pct + "%";
             if (command && command.length >= 3 && command[2] !== target) {
                 command = ["brightnessctl", "set", target];
                 running = true;
@@ -612,10 +613,11 @@ Item {
     }
 
     function setBrightnessFraction(val) {
-        var frac = Math.max(0.01, Math.min(1.0, Number(val) || 0.01));
+        var frac = Model.clampBrightness(val);
         root.brightness = frac;
         if (!brightnessSetProcess.running) {
-            brightnessSetProcess.command = ["brightnessctl", "set", Math.round(frac * 100) + "%"];
+            var pct = Math.max(1, Math.min(100, Math.round(frac * 100)));
+            brightnessSetProcess.command = ["brightnessctl", "set", pct + "%"];
             brightnessSetProcess.running = true;
         }
     }

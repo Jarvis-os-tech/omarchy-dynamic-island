@@ -94,6 +94,15 @@ assert.equal(validAppearance("graphite"), true);
 assert.equal(validAppearance("theme"), true);
 assert.equal(validAppearance("invalid"), false);
 
+// Test brightness clamping (min 1%, max 100%)
+assert.equal(clampBrightness(0), 0.01);
+assert.equal(clampBrightness(-0.5), 0.01);
+assert.equal(clampBrightness(0.005), 0.01);
+assert.equal(clampBrightness(0.5), 0.5);
+assert.equal(clampBrightness(1.0), 1.0);
+assert.equal(clampBrightness(1.5), 1.0);
+assert.equal(clampBrightness("invalid"), 0.01);
+
 console.log('quick controls model helpers passed');
 '''
     result = subprocess.run(['/usr/bin/node', '-e', source + '\n' + assertions], capture_output=True, text=True, timeout=15)

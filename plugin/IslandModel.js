@@ -159,6 +159,12 @@ function validAppearance(name) {
   return ["glass", "black", "graphite", "theme"].indexOf(name) !== -1;
 }
 
+function clampBrightness(fraction) {
+  var v = Number(fraction);
+  if (isNaN(v)) return 0.01;
+  return Math.max(0.01, Math.min(1.0, v));
+}
+
 // Bluetooth device icon names (freedesktop) -> Nerd Font glyph.
 function deviceGlyph(icon) {
   var i = String(icon || "").toLowerCase()

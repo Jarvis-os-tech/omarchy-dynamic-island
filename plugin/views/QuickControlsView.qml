@@ -180,7 +180,8 @@ Item {
                 view.island.brightness = frac;
             view.currentBrightness = frac;
             if (!brightnessSetProc.running) {
-                brightnessSetProc.command = ["brightnessctl", "set", Math.round(frac * 100) + "%"];
+                var pct = Math.max(1, Math.min(100, Math.round(frac * 100)));
+                brightnessSetProc.command = ["brightnessctl", "set", pct + "%"];
                 brightnessSetProc.running = true;
             }
         }
@@ -762,7 +763,7 @@ Item {
                     Text {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
-                        text: Math.round(view.brightnessFraction * 100) + "%"
+                        text: Math.max(1, Math.min(100, Math.round(view.brightnessFraction * 100))) + "%"
                         textFormat: Text.PlainText
                         renderType: Text.NativeRendering
                         font.family: view.textFamily
@@ -777,10 +778,10 @@ Item {
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onPressed: mouse => view.setBrightnessFraction(mouse.x / width)
+                    onPressed: mouse => view.setBrightnessFraction(Math.max(0.01, Math.min(1.0, mouse.x / width)))
                     onPositionChanged: mouse => {
                         if (pressed)
-                            view.setBrightnessFraction(mouse.x / width);
+                            view.setBrightnessFraction(Math.max(0.01, Math.min(1.0, mouse.x / width)));
                     }
                 }
             }
