@@ -41,6 +41,10 @@ Item {
     }
 
     readonly property bool notch: setting("style", "notch") !== "island"
+    readonly property string appearance: {
+        var a = String(setting("appearance", "glass"));
+        return Model.validAppearance(a) ? a : "glass";
+    }
     readonly property bool blackBackground: setting("background", "theme") === "black"
     readonly property bool idleHidden: setting("idle", "pill") === "hidden"
     readonly property real scaleFactor: Math.max(0.6, Math.min(2, Number(setting("scale", 1)) || 1))
@@ -82,6 +86,7 @@ Item {
     property bool configLoaded: false
 
     FileView {
+        id: shellConfigFile
         path: Quickshell.env("HOME") + "/.config/omarchy/shell.json"
         watchChanges: true
         onFileChanged: reload()
@@ -95,6 +100,51 @@ Item {
             root.settings = ({});
             root.configLoaded = true;
         }
+    }
+
+    function savePluginSetting(key, value) {
+        var next = {};
+        for (var k in settings)
+            next[k] = settings[k];
+        next[key] = value;
+        root.settings = next;
+
+        var changes = {};
+        changes[key] = value;
+        if (shell && typeof shell.updateEntryInline === "function") {
+            saveSettings(changes);
+        }
+
+        try {
+            var raw = shellConfigFile.text();
+            var cfg = Model.parseConfig(raw);
+            if (!Array.isArray(cfg.plugins))
+                cfg.plugins = [];
+            var found = false;
+            for (var i = 0; i < cfg.plugins.length; i++) {
+                if (cfg.plugins[i] && cfg.plugins[i].id === root.pluginId) {
+                    cfg.plugins[i][key] = value;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                var entry = { id: root.pluginId };
+                entry[key] = value;
+                cfg.plugins.push(entry);
+            }
+            shellConfigFile.setText(JSON.stringify(cfg, null, 2) + "\n");
+        } catch (e) {
+            console.warn("Failed to write to shell.json:", e);
+        }
+    }
+
+    function setIslandStyle(newStyle) {
+        savePluginSetting("style", newStyle);
+    }
+
+    function setIslandAppearance(newApp) {
+        savePluginSetting("appearance", newApp);
     }
 
     // ------------------------------------------------------------------
@@ -120,22 +170,49 @@ Item {
     }
 
     readonly property color surface: blackBackground ? "#000000" : Color.background
-    readonly property color fg: blackBackground ? "#f5f5f7" : Color.foreground
+    readonly property color fg: (blackBackground || root.appearance !== "theme") ? "#f5f5f7" : Color.foreground
     readonly property color fgDim: Util.alpha(fg, 0.6)
     readonly property color accentColor: Color.accent
     readonly property color urgentColor: Color.urgent
     readonly property color greenColor: themeColors.color2 || Color.accent
     readonly property color orangeColor: themeColors.color3 || Color.urgent
-    readonly property color outline: blackBackground ? "transparent" : Util.alpha(Color.foreground, 0.1)
-    // Obsidian body: lit a touch from above, deepening toward the lip, with a
-    // hairline rim. All derived from the theme, all vector (stays crisp).
-    readonly property color surfaceTop: Qt.tint(surface, Util.alpha(Color.foreground, blackBackground ? 0.05 : 0.055))
-    readonly property color surfaceBottom: blackBackground ? "#000000" : Qt.darker(surface, 1.28)
+    readonly property color outline: (blackBackground || root.appearance !== "theme") ? "transparent" : Util.alpha(Color.foreground, 0.1)
+    // Surface gradients & rim highlights:
+    // "glass": translucent slate (#e02a2e39 / #f014171f), rim #475569
+    // "black": OLED black (#fa05070a / #fc05070a), rim #1f242d
+    // "graphite": matte slate (#f21c1f26 / #f21c1f26), rim #2d3340
+    // "theme": dynamic system theme tokens
+    readonly property color surfaceTop: {
+        if (root.appearance === "glass")
+            return "#e02a2e39";
+        if (root.appearance === "black")
+            return "#fa05070a";
+        if (root.appearance === "graphite")
+            return "#f21c1f26";
+        return Qt.tint(surface, Util.alpha(Color.foreground, blackBackground ? 0.05 : 0.055));
+    }
+    readonly property color surfaceBottom: {
+        if (root.appearance === "glass")
+            return "#f014171f";
+        if (root.appearance === "black")
+            return "#fc05070a";
+        if (root.appearance === "graphite")
+            return "#f21c1f26";
+        return blackBackground ? "#000000" : Qt.darker(surface, 1.28);
+    }
     function bodyAt(t) {
         var a = surfaceTop, b = surfaceBottom;
-        return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, 1);
+        return Qt.rgba(a.r + (b.r - a.r) * t, a.g + (b.g - a.g) * t, a.b + (b.b - a.b) * t, a.a + (b.a - a.a) * t);
     }
-    readonly property color rim: Util.alpha(Color.foreground, blackBackground ? 0.08 : 0.1)
+    readonly property color rim: {
+        if (root.appearance === "glass")
+            return "#475569";
+        if (root.appearance === "black")
+            return "#1f242d";
+        if (root.appearance === "graphite")
+            return "#2d3340";
+        return Util.alpha(Color.foreground, blackBackground ? 0.08 : 0.1);
+    }
     // Numbers, time and icons in the theme's (Nerd) monospace; words in iA
     // Writer Quattro, which Omarchy ships and which sits well beside a mono.
     // "textFont": "theme" keeps everything in the theme font.
@@ -1852,7 +1929,7 @@ Item {
         implicitHeight: root.s(360) + root.topMargin
         color: "transparent"
 
-        WlrLayershell.namespace: "dynamic-island"
+        WlrLayershell.namespace: "omarchy-dynamic-island"
         WlrLayershell.layer: root.setting("layer", "overlay") === "top" ? WlrLayer.Top : WlrLayer.Overlay
         // Keyboard only while the calendar's link field is up (typing and
         // Ctrl+V go straight in; Esc hands it back). Otherwise the island never
