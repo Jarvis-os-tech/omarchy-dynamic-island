@@ -70,6 +70,35 @@ console.log('14 island model behavior assertions passed');
     result=subprocess.run(['/usr/bin/node','-e',source+'\n'+assertions],capture_output=True,text=True,timeout=15)
     assert result.returncode == 0,result.stderr
 
+def test_quick_controls_model_helpers():
+    source = (PLUGIN / 'IslandModel.js').read_text().replace('.pragma library', '', 1)
+    assertions = r'''
+const assert = require('node:assert/strict');
+
+// Test sizing for controls
+const res = sizeFor("controls", {}, { w: 0, h: 0, r: 0 });
+assert.equal(res.w, 440);
+assert.equal(res.h, 380);
+assert.equal(res.r, 34);
+
+// Test call duration formatting
+assert.equal(formatCallDuration(0), "00:00");
+assert.equal(formatCallDuration(75), "01:15");
+assert.equal(formatCallDuration(765), "12:45");
+assert.equal(formatCallDuration(3665), "1:01:05");
+
+// Test appearance themes
+assert.equal(validAppearance("glass"), true);
+assert.equal(validAppearance("black"), true);
+assert.equal(validAppearance("graphite"), true);
+assert.equal(validAppearance("theme"), true);
+assert.equal(validAppearance("invalid"), false);
+
+console.log('quick controls model helpers passed');
+'''
+    result = subprocess.run(['/usr/bin/node', '-e', source + '\n' + assertions], capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+
 def test_existing_screen_recovery_regressions_offscreen(tmp_path):
     runtime=tmp_path/'runtime';runtime.mkdir(mode=0o700)
     env=dict(os.environ,QT_QPA_PLATFORM='offscreen',QT_QUICK_BACKEND='software',

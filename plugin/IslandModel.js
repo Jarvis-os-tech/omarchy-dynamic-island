@@ -30,7 +30,8 @@ var sizes = {
   "clock-expanded": { w: 380, h: 132, r: 40 },
   "activity-expanded": { w: 392, h: 104, r: 38 },
   "calendar-expanded": { w: 500, h: 262, r: 40 },
-  "notification-actions": { w: 404, h: 118, r: 38 }
+  "notification-actions": { w: 404, h: 118, r: 38 },
+  "controls":      { w: 440, h: 380, r: 34 }
 }
 
 // Compact activities in priority order. The first one present owns the pill;
@@ -99,6 +100,7 @@ function sizeFor(view, counts, notch) {
   var base
   if (view === "inbox-expanded") base = inboxSize(counts && counts.inbox || 0)
   else if (view === "outputs-expanded") base = outputsSize(counts && counts.outputs || 0)
+  else if (view === "controls") base = sizes["controls"]
   else base = sizes[view] || sizes["idle"]
   if (!notch || !(notch.w > 0) || compactViews.indexOf(view) === -1) return base
   var h = Math.max(base.h, notch.h > 0 ? notch.h : base.h)
@@ -139,6 +141,22 @@ function formatClock(seconds, tenths) {
   var text = formatTime(whole)
   if (tenths) text += "." + Math.floor((s - whole) * 10)
   return text
+}
+
+function formatCallDuration(totalSeconds) {
+  var s = Math.max(0, Math.floor(totalSeconds || 0));
+  var hrs = Math.floor(s / 3600);
+  var mins = Math.floor((s % 3600) / 60);
+  var secs = s % 60;
+  var pad = function(n) { return (n < 10 ? "0" : "") + n; };
+  if (hrs > 0) {
+    return hrs + ":" + pad(mins) + ":" + pad(secs);
+  }
+  return pad(mins) + ":" + pad(secs);
+}
+
+function validAppearance(name) {
+  return ["glass", "black", "graphite", "theme"].indexOf(name) !== -1;
 }
 
 // Bluetooth device icon names (freedesktop) -> Nerd Font glyph.
