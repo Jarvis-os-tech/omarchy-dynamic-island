@@ -80,10 +80,26 @@ Item {
     fontFamily: island.fontFamily
   }
 
+  IconButton {
+    id: controlsBtn
+    anchors.right: parent.right
+    anchors.rightMargin: view.pad - island.s(4)
+    anchors.verticalCenter: art.verticalCenter
+    glyph: "󰘳"
+    glyphSize: island.f(17)
+    color: island.fgDim
+    fontFamily: island.fontFamily
+    onClicked: {
+      if (island && typeof island.switchExpandedView === "function") {
+        island.switchExpandedView("controls")
+      }
+    }
+  }
+
   Visualizer {
     id: viz
-    anchors.right: parent.right
-    anchors.rightMargin: view.pad + island.s(2)
+    anchors.right: controlsBtn.left
+    anchors.rightMargin: island.s(10)
     anchors.verticalCenter: art.verticalCenter
     playing: island.mediaPlaying
     color: island.mediaTint

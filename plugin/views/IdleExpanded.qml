@@ -48,7 +48,7 @@ Item {
         ? "󰃭  " + view.nextEvent.title + "  ·  " + Qt.formatDateTime(new Date(view.nextEvent.start), island.clockFormat.indexOf("AP") !== -1 ? "h:mm AP" : "HH:mm")
         : Qt.formatDateTime(clock.date, "dddd, d MMMM")
           + (island.calendar.todayAllDay.length > 0 ? "  ·  " + island.calendar.todayAllDay.join(", ") : "")
-      width: island.s(270)
+      width: island.s(250)
       elide: Text.ElideRight
       textFormat: Text.PlainText
       renderType: Text.NativeRendering
@@ -59,6 +59,7 @@ Item {
   }
 
   Column {
+    id: batteryCol
     anchors.right: parent.right
     anchors.rightMargin: view.pad
     y: island.s(20)
@@ -85,6 +86,23 @@ Item {
       font.pixelSize: island.f(11)
       font.features: { "tnum": 1 }
       color: island.fgDim
+    }
+  }
+
+  IconButton {
+    id: controlsBtn
+    anchors.right: island.hasBattery ? batteryCol.left : parent.right
+    anchors.rightMargin: island.hasBattery ? island.s(12) : view.pad
+    anchors.verticalCenter: island.hasBattery ? batteryCol.verticalCenter : undefined
+    y: island.hasBattery ? undefined : island.s(20)
+    glyph: "󰘳"
+    glyphSize: island.f(17)
+    color: island.fgDim
+    fontFamily: island.fontFamily
+    onClicked: {
+      if (island && typeof island.switchExpandedView === "function") {
+        island.switchExpandedView("controls")
+      }
     }
   }
 

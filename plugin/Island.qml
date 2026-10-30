@@ -402,12 +402,21 @@ Item {
     // Audio (PipeWire): output volume HUD and microphone privacy activity
     // ------------------------------------------------------------------
     readonly property var sink: Pipewire.defaultAudioSink
+    readonly property var source: Pipewire.defaultAudioSource
     PwObjectTracker {
-        objects: root.sink ? [root.sink] : []
+        objects: {
+            var list = [];
+            if (root.sink)
+                list.push(root.sink);
+            if (root.source)
+                list.push(root.source);
+            return list;
+        }
     }
 
     readonly property real volume: sink && sink.audio ? sink.audio.volume : 0
     readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
+    readonly property bool micMuted: Pipewire.defaultAudioSource && Pipewire.defaultAudioSource.audio ? Pipewire.defaultAudioSource.audio.muted : false
     onVolumeChanged: volumeHud()
     onMutedChanged: volumeHud()
 
@@ -432,12 +441,53 @@ Item {
         sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + (delta > 0 ? 0.05 : -0.05)));
     }
 
+    function setVolumeFraction(val) {
+        if (!sink || !sink.audio)
+            return;
+        sink.audio.muted = false;
+        sink.audio.volume = Model.clamp01(val);
+    }
+
+    function toggleMicMute() {
+        var src = Pipewire.defaultAudioSource;
+        if (src && src.audio) {
+            src.audio.muted = !src.audio.muted;
+        }
+    }
+
     readonly property var pwNodes: Pipewire.nodes ? Pipewire.nodes.values : []
     readonly property bool micActive: {
         for (var i = 0; i < pwNodes.length; i++)
             if (Model.isMicStream(pwNodes[i]))
                 return true;
         return false;
+    }
+
+    property double callStartTime: 0
+    property int callDurationSeconds: 0
+    readonly property string callDurationText: Model.formatCallDuration(callDurationSeconds)
+    onMicActiveChanged: {
+        if (micActive) {
+            callStartTime = Date.now();
+            callDurationSeconds = 0;
+            callTimer.restart();
+        } else {
+            callTimer.stop();
+            callDurationSeconds = 0;
+            callStartTime = 0;
+        }
+    }
+    Timer {
+        id: callTimer
+        interval: 1000
+        repeat: true
+        running: root.micActive
+        onTriggered: {
+            if (root.callStartTime <= 0 && root.micActive)
+                root.callStartTime = Date.now();
+            if (root.callStartTime > 0)
+                root.callDurationSeconds = Math.max(0, Math.floor((Date.now() - root.callStartTime) / 1000));
+        }
     }
 
     property bool voiceAgentActive: false
@@ -545,6 +595,17 @@ Item {
                 duration: 1500
             });
         }
+    }
+
+    Process {
+        id: brightnessSetProcess
+    }
+
+    function setBrightnessFraction(val) {
+        var frac = Model.clamp01(val);
+        root.brightness = frac;
+        brightnessSetProcess.command = ["brightnessctl", "set", Math.round(frac * 100) + "%"];
+        brightnessSetProcess.running = true;
     }
 
     // ------------------------------------------------------------------
@@ -1298,6 +1359,7 @@ Item {
     readonly property string secondary: activityList.length > 1 ? activityList[1] : ""
 
     property bool userExpanded: false
+    property string requestedSubView: "media"
     property bool inboxOpen: false
     // Which activity an opened island is about (the bubble's, when the
     // bubble was clicked).
@@ -1305,21 +1367,32 @@ Item {
     property var hud: null
     readonly property bool hovered: islandHover.hovered
 
-    readonly property string view: Model.viewFor({
-        userExpanded: userExpanded,
-        inboxOpen: inboxOpen,
-        outputsOpen: outputsOpen,
-        calendarOpen: calendarOpen,
-        focus: openFocus,
-        hasMedia: hasMedia,
-        recording: recordingActivity,
-        hud: hud,
-        notification: notification !== null,
-        notificationActions: notification !== null && notification.actions.length > 0,
-        primary: primary,
-        idleHidden: idleHidden,
-        hovered: hovered
-    })
+    function switchExpandedView(sub) {
+        requestedSubView = (sub === "controls") ? "controls" : "media";
+        if (!userExpanded)
+            userExpanded = true;
+    }
+
+    readonly property string view: {
+        if (userExpanded && requestedSubView === "controls" && !inboxOpen && !outputsOpen && !calendarOpen) {
+            return "controls";
+        }
+        return Model.viewFor({
+            userExpanded: userExpanded,
+            inboxOpen: inboxOpen,
+            outputsOpen: outputsOpen,
+            calendarOpen: calendarOpen,
+            focus: openFocus,
+            hasMedia: hasMedia,
+            recording: recordingActivity,
+            hud: hud,
+            notification: notification !== null,
+            notificationActions: notification !== null && notification.actions.length > 0,
+            primary: primary,
+            idleHidden: idleHidden,
+            hovered: hovered
+        });
+    }
     readonly property var viewCounts: ({
             inbox: inbox.length,
             outputs: audioOutputs.length
@@ -1372,6 +1445,7 @@ Item {
         calendarOpen = false;
         calendarAdding = false;
         openFocus = "";
+        requestedSubView = "media";
         collapseTimer.stop();
     }
 
@@ -2511,6 +2585,16 @@ Item {
                         width: root.s(root.slotSize("idle-expanded").w)
                         height: root.s(root.slotSize("idle-expanded").h)
                         IdleExpanded {
+                            anchors.fill: parent
+                            island: root
+                        }
+                    }
+
+                    ViewSlot {
+                        active: root.showing("controls")
+                        width: root.s(root.slotSize("controls").w)
+                        height: root.s(root.slotSize("controls").h)
+                        QuickControlsView {
                             anchors.fill: parent
                             island: root
                         }

@@ -9,9 +9,9 @@
     },
     {
       "path": "Island.qml",
-      "sha256": "1e26f29ae956480d8c6b1af8f67e1bf9929daac44278a1cb22eefd4a6bff7bdc",
+      "sha256": "1057f58396aede4243a68d2af36fce2ab8f4e504e6abcf97a16e523fdacca2b5",
       "mode": 420,
-      "bytes": 99347
+      "bytes": 102167
     },
     {
       "path": "IslandModel.js",
@@ -159,9 +159,9 @@
     },
     {
       "path": "views/IdleExpanded.qml",
-      "sha256": "ca290903b0fc5630ad96223c4788f268731f15367b2160ae647082223868a6c5",
+      "sha256": "2e5a17659e050c398b513f35c6a16c4f68cd9c877a2103d7b5ddc0ed448a07ee",
       "mode": 420,
-      "bytes": 4728
+      "bytes": 5316
     },
     {
       "path": "views/IdleFace.qml",
@@ -195,9 +195,9 @@
     },
     {
       "path": "views/MediaExpanded.qml",
-      "sha256": "464697fdf30db67a4d7e10ae060bbd91f6f589266cac0585f017a638f6675a62",
+      "sha256": "c6eb962c920270638f4196f6a491c3f09082d389bb986932418cd8f4d9f171d8",
       "mode": 420,
-      "bytes": 8038
+      "bytes": 8451
     },
     {
       "path": "views/MicCompact.qml",
