@@ -129,7 +129,9 @@ Item {
                 }
             }
             if (!found) {
-                var entry = { id: root.pluginId };
+                var entry = {
+                    id: root.pluginId
+                };
                 entry[key] = value;
                 cfg.plugins.push(entry);
             }
@@ -1511,6 +1513,8 @@ Item {
         } catch (e) {}
         if (payload && payload.title)
             toast(payload);
+        else if (payload && payload.view === "controls")
+            switchExpandedView("controls");
         else
             expand();
     }
@@ -1831,6 +1835,24 @@ Item {
             root.open(payloadJson);
             return "ok";
         }
+        function controls(): string {
+            root.switchExpandedView("controls");
+            return "ok";
+        }
+        function setStyle(val: string): string {
+            if (val === "notch" || val === "island") {
+                root.setIslandStyle(val);
+                return "ok";
+            }
+            return "usage: setStyle notch|island";
+        }
+        function setAppearance(val: string): string {
+            if (Model.validAppearance(val)) {
+                root.setIslandAppearance(val);
+                return "ok";
+            }
+            return "usage: setAppearance glass|black|graphite|theme";
+        }
         function demo(kind: string): string {
             return root.runDemo(kind);
         }
@@ -1915,6 +1937,9 @@ Item {
         function state(): string {
             return JSON.stringify({
                 view: root.view,
+                controls: root.view === "controls",
+                style: root.notch ? "notch" : "island",
+                appearance: root.appearance,
                 primary: root.primary,
                 secondary: root.secondary,
                 expanded: root.userExpanded,
