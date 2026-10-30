@@ -36,7 +36,7 @@ var sizes = {
 
 // Compact activities in priority order. The first one present owns the pill;
 // the second one, if any, gets the detached bubble on the right.
-var activityOrder = ["recording", "timer", "activity", "media", "stopwatch", "calendar", "mic", "inbox"]
+var activityOrder = ["recording", "mic", "timer", "activity", "media", "stopwatch", "calendar", "inbox"]
 
 function activities(flags) {
   var out = []
