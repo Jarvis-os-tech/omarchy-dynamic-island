@@ -12,7 +12,7 @@ MANIFEST = json.loads((ROOT/'verification/source_manifest.json').read_text())
 
 def test_complete_source_and_license_preserved():
     rows = MANIFEST['files']
-    assert len(rows) == 44
+    assert len(rows) == 45
     assert {str(p.relative_to(PLUGIN)) for p in PLUGIN.rglob('*') if p.is_file()} == {r['path'] for r in rows}
     for row in rows:
         p = PLUGIN/row['path']
@@ -39,7 +39,7 @@ def test_manifest_and_local_imports_complete():
 
 def test_all_qml_parses_without_executing_plugin():
     paths = sorted(PLUGIN.rglob('*.qml'))
-    assert len(paths) == 39
+    assert len(paths) == 40
     errors=[]
     for p in paths:
         result=subprocess.run(['/usr/lib/qt6/bin/qmlformat','--ignore-settings',str(p)],

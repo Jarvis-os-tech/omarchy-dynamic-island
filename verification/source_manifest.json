@@ -224,6 +224,12 @@
       "bytes": 1278
     },
     {
+      "path": "views/QuickControlsView.qml",
+      "sha256": "f37e08780c03b51c40ed1bcf96c517bf5a4b5838bfcedad9f752afb59504f98f",
+      "mode": 420,
+      "bytes": 45101
+    },
+    {
       "path": "views/RecordDot.qml",
       "sha256": "57a5365e50fbbdbda2644d4f9945ebbac440dc9e0fde91abe04a51de9ba57546",
       "mode": 420,
