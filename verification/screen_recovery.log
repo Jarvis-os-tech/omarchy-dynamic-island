@@ -1,0 +1,11 @@
+********* Start testing of qmltestrunner *********
+Config: Using QtTest library 6.12.0, Qt 6.12.0 (x86_64-little_endian-lp64 shared (dynamic) release build; by GCC 16.2.1 20260810), omarchy 4.0.6
+PASS   : qmltestrunner::ScreenRecovery::initTestCase()
+PASS   : qmltestrunner::ScreenRecovery::test_compositor_close_with_same_screen()
+PASS   : qmltestrunner::ScreenRecovery::test_disconnect_reconnect()
+PASS   : qmltestrunner::ScreenRecovery::test_monitor_move()
+PASS   : qmltestrunner::ScreenRecovery::test_repeated_close_waits_for_settle()
+PASS   : qmltestrunner::ScreenRecovery::test_screen_switch()
+PASS   : qmltestrunner::ScreenRecovery::cleanupTestCase()
+Totals: 7 passed, 0 failed, 0 skipped, 0 blacklisted, 2130ms
+********* Finished testing of qmltestrunner *********

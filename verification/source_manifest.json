@@ -1,0 +1,269 @@
+{
+  "source": "/home/g0pi/.config/omarchy/plugins/omarchy-dynamic-island",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "405c7e9a52883194cd5b95a435948eda03961e5c399cb81bc67939d1681d3ff5",
+      "mode": 420,
+      "bytes": 13
+    },
+    {
+      "path": "Island.qml",
+      "sha256": "8c30f34bddfc86d513ef76bec271e703cf32aa78836c989e40cbff731d03fd63",
+      "mode": 420,
+      "bytes": 75389
+    },
+    {
+      "path": "IslandModel.js",
+      "sha256": "01ccbc29c6e34de97b2926545ec454f8839efb8c5245726816cfcaec6ddc0f4e",
+      "mode": 420,
+      "bytes": 27034
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "390bb8582534f5f087a77b44bf6b2671b0a49c821f5fe6b6fa7ee78406cb48a6",
+      "mode": 420,
+      "bytes": 1092
+    },
+    {
+      "path": "Notifications.qml",
+      "sha256": "c35e18ec8e66b928264c91278d81a7038fba8f2906535b955a9aadc24b247062",
+      "mode": 420,
+      "bytes": 13999
+    },
+    {
+      "path": "README.md",
+      "sha256": "2cbfc8a25ef63a4fdeaf9a1a18ae50e8901e65e5731d0702035ea83081cc797b",
+      "mode": 420,
+      "bytes": 14877
+    },
+    {
+      "path": "ScreenRecovery.qml",
+      "sha256": "e16839b80c8e59d74249dd8be626d53a4d82756d7efd214a5e230a5a4d7737c2",
+      "mode": 420,
+      "bytes": 1129
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "93fb0f39960e8e52a418374a567eb1ea50e66fa3fbd374a634fdf384c713165e",
+      "mode": 420,
+      "bytes": 456
+    },
+    {
+      "path": "sources/Activities.qml",
+      "sha256": "0eb19b76aca90eccaac292511ee8e0db66adc7214235ea355b5fca9aa8613d7c",
+      "mode": 420,
+      "bytes": 2894
+    },
+    {
+      "path": "sources/Calendar.qml",
+      "sha256": "e8efe609b825f5a18f06a40868ac0103ffae415afa379cf12fdc2fc9920629cc",
+      "mode": 420,
+      "bytes": 13113
+    },
+    {
+      "path": "sources/Clocks.qml",
+      "sha256": "c140adea472a2cc6cec933713da8b8f13233d135a4040c5e0840607efe584ee0",
+      "mode": 420,
+      "bytes": 4977
+    },
+    {
+      "path": "sources/Devices.qml",
+      "sha256": "7940de87ec3dec5426adcab372705e6c810111023446d460d1008e1c10bfe935",
+      "mode": 420,
+      "bytes": 2253
+    },
+    {
+      "path": "tests/tst_screen_recovery.qml",
+      "sha256": "68dff0d989224aad8096d5941fbe5e017477abd96405f88eff2ef580f59c83d0",
+      "mode": 420,
+      "bytes": 1533
+    },
+    {
+      "path": "views/ActivityCompact.qml",
+      "sha256": "624dd3b3c4ce52302bd08896725b122af2fd66c5e81da32b23f88603b2c676d0",
+      "mode": 420,
+      "bytes": 1576
+    },
+    {
+      "path": "views/ActivityExpanded.qml",
+      "sha256": "6d73f7ccf33fc74f412d5207a96699c6601702858960d09f32616165d2ed9b27",
+      "mode": 420,
+      "bytes": 3457
+    },
+    {
+      "path": "views/AlbumArt.qml",
+      "sha256": "3a7bf62a4eedaef9a1d3d7687616c357d371a4de0fdee3ca703c6f3df9b9e197",
+      "mode": 420,
+      "bytes": 3025
+    },
+    {
+      "path": "views/BubbleContent.qml",
+      "sha256": "493b5fb85a412154af656f2475188d80bab3d1ac9dcc2d2ef0afb02000ae4458",
+      "mode": 420,
+      "bytes": 2473
+    },
+    {
+      "path": "views/CalendarCompact.qml",
+      "sha256": "fe246198604ab51700371c861b29c7437a0847449eb47fa4d6921081ddceb76d",
+      "mode": 420,
+      "bytes": 1613
+    },
+    {
+      "path": "views/CalendarView.qml",
+      "sha256": "41b5dcc9aca333b0c48b2743e34c28aca906a7abb29a15b61b685a91f221125e",
+      "mode": 420,
+      "bytes": 19629
+    },
+    {
+      "path": "views/ClockCompact.qml",
+      "sha256": "acb49e9f209a87538bdee5f6f41ebcff3f2abd25df8a034876ce4667090ca7a5",
+      "mode": 420,
+      "bytes": 1709
+    },
+    {
+      "path": "views/ClockExpanded.qml",
+      "sha256": "6d9d8c12c6cec7cab73da707e685729857446fcf09ea7995c6c6b12d96768bcb",
+      "mode": 420,
+      "bytes": 3004
+    },
+    {
+      "path": "views/EdgeLight.qml",
+      "sha256": "262d721986473ccb11a718b41fb74d3063e6d262142e77d43f27fd200af3fd86",
+      "mode": 420,
+      "bytes": 3606
+    },
+    {
+      "path": "views/Flip.qml",
+      "sha256": "869aa4de99c70c08f76c1718dcaa9254b334b85b4cc14cfc799dcb31f5a1ad41",
+      "mode": 420,
+      "bytes": 2334
+    },
+    {
+      "path": "views/HudLabel.qml",
+      "sha256": "3a52b5f409920440767af33680d7719b5c4cca72198dadb7efb056673b1cb89a",
+      "mode": 420,
+      "bytes": 1552
+    },
+    {
+      "path": "views/HudProgress.qml",
+      "sha256": "66480d344d5f3478ab1d62dd52d3a8fb742bfcbf854a43cbeabef85cfeb6f71d",
+      "mode": 420,
+      "bytes": 1720
+    },
+    {
+      "path": "views/IconButton.qml",
+      "sha256": "780b8d5231f27bf88af8f301fbc893e1d906e885af25365ec03311baef0deb5f",
+      "mode": 420,
+      "bytes": 1233
+    },
+    {
+      "path": "views/IdleExpanded.qml",
+      "sha256": "ca290903b0fc5630ad96223c4788f268731f15367b2160ae647082223868a6c5",
+      "mode": 420,
+      "bytes": 4728
+    },
+    {
+      "path": "views/IdleFace.qml",
+      "sha256": "58d8855c33cb80f26fbbd0cfc9abac6816c9c2d914eae4ad0dac31bd37342abc",
+      "mode": 420,
+      "bytes": 1658
+    },
+    {
+      "path": "views/InboxCompact.qml",
+      "sha256": "93186c0a0f27553cf107491262f8d7d12199cf8d06fd89c82e4e98f8f3045e42",
+      "mode": 420,
+      "bytes": 1112
+    },
+    {
+      "path": "views/InboxView.qml",
+      "sha256": "798c541d946007e2d47223872264ee675caad2d1d60a87adf21e30af8e12e016",
+      "mode": 420,
+      "bytes": 5591
+    },
+    {
+      "path": "views/Marquee.qml",
+      "sha256": "4c3d27dd03a38ea5352b629192adf7ecd4377324dd1295af52f29101631d563d",
+      "mode": 420,
+      "bytes": 2938
+    },
+    {
+      "path": "views/MediaCompact.qml",
+      "sha256": "9ad382e416984b9d3fba145aacdeaac9cb09c0a90290651a7fedbefd1376d570",
+      "mode": 420,
+      "bytes": 1391
+    },
+    {
+      "path": "views/MediaExpanded.qml",
+      "sha256": "464697fdf30db67a4d7e10ae060bbd91f6f589266cac0585f017a638f6675a62",
+      "mode": 420,
+      "bytes": 8038
+    },
+    {
+      "path": "views/MicCompact.qml",
+      "sha256": "71d78c094b9d7e850d9aacdb13e586d42efba2a63511413c722bcfe32cbc5e8f",
+      "mode": 420,
+      "bytes": 850
+    },
+    {
+      "path": "views/NotificationView.qml",
+      "sha256": "94828e988c812baf704d3e3c68baf2612a1cc8ff9c4af24862b7f552c2c46987",
+      "mode": 420,
+      "bytes": 6196
+    },
+    {
+      "path": "views/OutputsView.qml",
+      "sha256": "9fe0e2c56100e8db206bd435ca4200a3a1772c934e546ea1e6d382648d5d515a",
+      "mode": 420,
+      "bytes": 3312
+    },
+    {
+      "path": "views/ProgressRing.qml",
+      "sha256": "072d1f933e2c382a4351d6f5f73d9e39ce71e056867017fc6624757d3eb38ab4",
+      "mode": 420,
+      "bytes": 1278
+    },
+    {
+      "path": "views/RecordDot.qml",
+      "sha256": "57a5365e50fbbdbda2644d4f9945ebbac440dc9e0fde91abe04a51de9ba57546",
+      "mode": 420,
+      "bytes": 472
+    },
+    {
+      "path": "views/RecordingCompact.qml",
+      "sha256": "064e0c86a8256d24b57ecf3bd95f9d1554a59ecf99ba4fa537d48719998ea574",
+      "mode": 420,
+      "bytes": 1193
+    },
+    {
+      "path": "views/RecordingExpanded.qml",
+      "sha256": "51f2352ed4640b92c622913eee088df3f66a4be6cfe25ee51a427115467fa60f",
+      "mode": 420,
+      "bytes": 4935
+    },
+    {
+      "path": "views/ToastHud.qml",
+      "sha256": "c8d201f1928ee143d001dc5c0c9f5100f435ca9c744bec3cd532692d545ac589",
+      "mode": 420,
+      "bytes": 1606
+    },
+    {
+      "path": "views/TrackHud.qml",
+      "sha256": "94190fcfa314f43d559cc22119f735ced2a5d9c0cf0d68568017b34d26b7a96b",
+      "mode": 420,
+      "bytes": 1496
+    },
+    {
+      "path": "views/ViewSlot.qml",
+      "sha256": "27cbd074dd0c4f9a245879209ecb44c375f074c0e1a3b67ec9de40f9d58a857e",
+      "mode": 420,
+      "bytes": 1435
+    },
+    {
+      "path": "views/Visualizer.qml",
+      "sha256": "898bb001d06495b5d2ee65b401f29436e3923ab594feb47ec837a7a298d590eb",
+      "mode": 420,
+      "bytes": 1225
+    }
+  ]
+}
