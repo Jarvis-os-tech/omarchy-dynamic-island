@@ -113,6 +113,7 @@ Item {
         changes[key] = value;
         if (shell && typeof shell.updateEntryInline === "function") {
             saveSettings(changes);
+            return;
         }
 
         try {
@@ -467,7 +468,7 @@ Item {
 
     property double callStartTime: 0
     property int callDurationSeconds: 0
-    readonly property string callDurationText: Model.formatCallDuration(callDurationSeconds)
+    readonly property string callDurationText: micActive ? Model.formatCallDuration(callDurationSeconds) : ""
     onMicActiveChanged: {
         if (micActive) {
             callStartTime = Date.now();
@@ -601,13 +602,22 @@ Item {
 
     Process {
         id: brightnessSetProcess
+        onExited: {
+            var target = Math.round(root.brightness * 100) + "%";
+            if (command && command.length >= 3 && command[2] !== target) {
+                command = ["brightnessctl", "set", target];
+                running = true;
+            }
+        }
     }
 
     function setBrightnessFraction(val) {
-        var frac = Model.clamp01(val);
+        var frac = Math.max(0.01, Math.min(1.0, Number(val) || 0.01));
         root.brightness = frac;
-        brightnessSetProcess.command = ["brightnessctl", "set", Math.round(frac * 100) + "%"];
-        brightnessSetProcess.running = true;
+        if (!brightnessSetProcess.running) {
+            brightnessSetProcess.command = ["brightnessctl", "set", Math.round(frac * 100) + "%"];
+            brightnessSetProcess.running = true;
+        }
     }
 
     // ------------------------------------------------------------------
@@ -2025,7 +2035,7 @@ Item {
         }
         // Tall enough for the biggest view (a full inbox or output list); only
         // the island itself takes input, the rest of the strip is click-through.
-        implicitHeight: root.s(360) + root.topMargin
+        implicitHeight: root.s(400) + root.topMargin
         color: "transparent"
 
         WlrLayershell.namespace: "omarchy-dynamic-island"

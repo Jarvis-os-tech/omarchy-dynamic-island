@@ -85,7 +85,7 @@ Item {
     Timer {
         id: wifiQueryTimer
         interval: 5000
-        running: true
+        running: view.visible
         repeat: true
         triggeredOnStart: true
         onTriggered: {
@@ -161,10 +161,8 @@ Item {
 
     property real currentBrightness: 0.6
     readonly property real brightnessFraction: {
-        if (view.island && view.island.brightness !== undefined && view.island.brightness >= 0) {
-            return view.island.brightness;
-        }
-        return view.currentBrightness >= 0 ? view.currentBrightness : 0.6;
+        var b = (view.island && view.island.brightness !== undefined && view.island.brightness >= 0) ? view.island.brightness : (view.currentBrightness >= 0 ? view.currentBrightness : 0.6);
+        return Math.max(0.01, Math.min(1.0, b));
     }
 
     Process {
@@ -172,7 +170,7 @@ Item {
     }
 
     function setBrightnessFraction(fraction) {
-        var frac = Math.max(0, Math.min(1, fraction));
+        var frac = Math.max(0.01, Math.min(1.0, Number(fraction) || 0.01));
         if (view.island && typeof view.island.setBrightnessFraction === "function") {
             view.island.setBrightnessFraction(frac);
         } else if (view.island && typeof view.island.setBrightness === "function") {
@@ -181,8 +179,10 @@ Item {
             if (view.island)
                 view.island.brightness = frac;
             view.currentBrightness = frac;
-            brightnessSetProc.command = ["brightnessctl", "set", Math.round(frac * 100) + "%"];
-            brightnessSetProc.running = true;
+            if (!brightnessSetProc.running) {
+                brightnessSetProc.command = ["brightnessctl", "set", Math.round(frac * 100) + "%"];
+                brightnessSetProc.running = true;
+            }
         }
     }
 
@@ -199,12 +199,7 @@ Item {
         return false;
     }
 
-    readonly property string callDurationDisplay: {
-        var text = view.island && view.island.callDurationText ? String(view.island.callDurationText) : "";
-        if (!text)
-            return "No call";
-        return text.indexOf("Call") !== -1 ? text : ("Call: " + text);
-    }
+    readonly property string callDurationDisplay: (!view.island || !view.island.micActive || !view.island.callDurationText) ? "No call" : ("Call: " + view.island.callDurationText)
 
     function toggleMicMute() {
         if (view.island && typeof view.island.toggleMicMute === "function") {
@@ -234,7 +229,7 @@ Item {
     Timer {
         id: nightLightTimer
         interval: 5000
-        running: true
+        running: view.visible
         repeat: true
         triggeredOnStart: true
         onTriggered: {
@@ -244,12 +239,7 @@ Item {
     }
 
     function toggleNightLight() {
-        view.nightLightActive = !view.nightLightActive;
-        if (view.nightLightActive) {
-            nightLightToggleProc.command = ["hyprsunset", "-t", "4000"];
-        } else {
-            nightLightToggleProc.command = ["pkill", "-x", "hyprsunset"];
-        }
+        nightLightToggleProc.command = ["sh", "-c", "pkill -x hyprsunset || hyprsunset -t 4000 &"];
         nightLightToggleProc.running = true;
     }
 
@@ -282,7 +272,7 @@ Item {
     Timer {
         id: powerProfileTimer
         interval: 5000
-        running: true
+        running: view.visible
         repeat: true
         triggeredOnStart: true
         onTriggered: {

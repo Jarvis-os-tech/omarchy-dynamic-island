@@ -9,9 +9,9 @@
     },
     {
       "path": "Island.qml",
-      "sha256": "01ec311aaf1e77b165276a7063153901f5c2af490998f6d5e9000b77cff98d41",
+      "sha256": "c251fc8145157f690a90c2ab4580dbc5c6eb377a85e74b0f0ca4aae2ce56509e",
       "mode": 420,
-      "bytes": 103099
+      "bytes": 103508
     },
     {
       "path": "IslandModel.js",
@@ -225,9 +225,9 @@
     },
     {
       "path": "views/QuickControlsView.qml",
-      "sha256": "f37e08780c03b51c40ed1bcf96c517bf5a4b5838bfcedad9f752afb59504f98f",
+      "sha256": "9ba698603a521729cb01e115a535d95aedb786cc4a8f7964fbd5b2f5f41b4cff",
       "mode": 420,
-      "bytes": 45101
+      "bytes": 44954
     },
     {
       "path": "views/RecordDot.qml",
