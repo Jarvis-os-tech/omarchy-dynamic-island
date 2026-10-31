@@ -159,9 +159,9 @@ Item {
     }
 
     // How long a banner holds: exactly 3 seconds (3000 ms), then automatically
-    // retires to restore the normal island state. Critical stays until handled.
+    // retires to restore the normal island state.
     function durationFor(entry) {
-        if (!entry || entry.critical)
+        if (!entry)
             return 0;
         return 3000;
     }
@@ -308,25 +308,42 @@ Item {
     // Banner timeout, paused while the pointer is on the island.
     Timer {
         id: expiry
-        interval: Math.max(1000, service.durationFor(service.current))
-        running: service.current !== null && service.durationFor(service.current) > 0 && !(service.island && (service.island.hovered || service.island.userExpanded))
+        interval: 3000
+        repeat: false
+        running: false
         onTriggered: if (service.current)
             service.retire(service.current.key)
     }
 
-    readonly property bool islandHovered: service.island ? (service.island.hovered || service.island.userExpanded) : false
+    readonly property bool islandHovered: service.island ? service.island.hovered : false
 
     onIslandHoveredChanged: {
-        if (!islandHovered && service.current !== null && service.durationFor(service.current) > 0) {
-            expiry.interval = 1500;
+        if (islandHovered) {
+            expiry.stop();
+        } else if (service.current !== null) {
+            expiry.interval = 3000;
             expiry.restart();
         }
     }
 
     onCurrentChanged: {
-        expiry.interval = Math.max(1000, service.durationFor(service.current));
-        if (expiry.running)
+        if (service.current !== null) {
+            if (!islandHovered) {
+                expiry.interval = 3000;
+                expiry.restart();
+            } else {
+                expiry.stop();
+            }
+        } else {
+            expiry.stop();
+        }
+    }
+
+    Component.onCompleted: {
+        if (service.current !== null && !islandHovered) {
+            expiry.interval = 3000;
             expiry.restart();
+        }
     }
 
     // ------------------------------------------------------------- inbox file

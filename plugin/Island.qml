@@ -1451,8 +1451,10 @@ Item {
     property int edgeSweep: 0
 
     // A bead of light runs along the lip when something arrives.
-    onNotificationChanged: if (notification)
-        edgeSweep++
+    onNotificationChanged: if (notification) {
+        userExpanded = false;
+        edgeSweep++;
+    }
 
     // ------------------------------------------------------------------
     // State
