@@ -37,6 +37,30 @@ Item {
         color: island.accentColor
     }
 
+    Rectangle {
+        visible: view.kind === "inbox" && island && island.inbox.length > 1
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: island ? island.s(1) : 1
+        anchors.rightMargin: island ? island.s(1) : 1
+        height: island ? island.s(12) : 12
+        width: Math.max(height, badgeText.implicitWidth + (island ? island.s(6) : 6))
+        radius: height / 2
+        color: island ? island.urgentColor : "#ef4444"
+
+        Text {
+            id: badgeText
+            anchors.centerIn: parent
+            text: island ? island.inbox.length : ""
+            textFormat: Text.PlainText
+            renderType: Text.NativeRendering
+            font.family: island ? island.textFamily : "sans-serif"
+            font.pixelSize: island ? island.f(8) : 8
+            font.weight: Font.Bold
+            color: "#ffffff"
+        }
+    }
+
     // Timer / activity: their ring, so progress is readable even here.
     ProgressRing {
         anchors.fill: parent

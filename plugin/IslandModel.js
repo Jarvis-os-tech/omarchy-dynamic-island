@@ -22,6 +22,7 @@ var sizes = {
   "recording-media-expanded": { w: 404, h: 145, r: 40 },
   "idle-expanded": { w: 424, h: 150, r: 40 },
   "notification":  { w: 404, h: 78, r: 34 },
+  "notification-expanded": { w: 424, h: 140, r: 40 },
   "inbox":         { w: 200, h: 32, r: 16 },
   "timer":         { w: 236, h: 32, r: 16 },
   "stopwatch":     { w: 236, h: 32, r: 16 },
@@ -31,6 +32,7 @@ var sizes = {
   "activity-expanded": { w: 392, h: 104, r: 38 },
   "calendar-expanded": { w: 500, h: 262, r: 40 },
   "notification-actions": { w: 404, h: 118, r: 38 },
+  "notification-actions-expanded": { w: 424, h: 180, r: 40 },
   "controls":      { w: 440, h: 380, r: 34 },
   "aifleet":       { w: 440, h: 380, r: 34 }
 }
@@ -53,6 +55,12 @@ function viewFor(state) {
   if (state.userExpanded && state.inboxOpen) return "inbox-expanded"
   if (state.userExpanded && state.outputsOpen) return "outputs-expanded"
   if (state.userExpanded && state.calendarOpen) return "calendar-expanded"
+  if (state.hud && state.hud.layout === "progress") return "hud-progress"
+  if (state.notification) {
+    var isExpanded = !!(state.hovered || state.userExpanded)
+    if (isExpanded) return state.notificationActions ? "notification-actions-expanded" : "notification-expanded"
+    return state.notificationActions ? "notification-actions" : "notification"
+  }
   if (state.userExpanded) {
     // Recording takes the top of an opened island so it can be stopped from
     // there; music, if any, rides along underneath.
@@ -66,8 +74,6 @@ function viewFor(state) {
     if (focus === "media" && state.hasMedia) return "media-expanded"
     return state.hasMedia && focus !== "calendar" ? "media-expanded" : "idle-expanded"
   }
-  if (state.hud && state.hud.layout === "progress") return "hud-progress"
-  if (state.notification) return state.notificationActions ? "notification-actions" : "notification"
   if (state.hud) return state.hud.layout === "progress" ? "hud-progress"
     : (state.hud.layout === "track" ? "hud-track"
       : (state.hud.layout === "toast" ? "hud-toast" : "hud-label"))
@@ -583,7 +589,7 @@ function entryFor(cfg, pluginId) {
 // Senders that are feedback noise rather than messages (Omarchy's rule).
 function isEphemeralApp(appName) {
   var name = String(appName || "")
-  return name === "notify-send" || name === "omarchy-action"
+  return name === "omarchy-action"
 }
 
 function stringHint(hints, name) {

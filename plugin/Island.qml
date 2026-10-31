@@ -1434,7 +1434,13 @@ Item {
     })
     readonly property var activityList: activeTasks.concat(inboxActivity ? ["inbox"] : [])
     readonly property string primary: activeTasks.length > 0 ? activeTasks[0] : ""
-    readonly property string secondary: activeTasks.length > 1 ? activeTasks[1] : (inboxActivity && activeTasks.length > 0 ? "inbox" : "")
+    readonly property string secondary: {
+        if (activeTasks.length > 1)
+            return activeTasks[1];
+        if (inboxActivity)
+            return "inbox";
+        return "";
+    }
 
     property bool userExpanded: false
     property string requestedSubView: "media"
@@ -1493,7 +1499,7 @@ Item {
     function slotSize(name) {
         return Model.sizeFor(name, viewCounts, notchSize);
     }
-    readonly property bool showBubble: secondary !== "" && !userExpanded && hud === null
+    readonly property bool showBubble: secondary !== "" && !userExpanded && hud === null && notification === null
 
     function showHud(next) {
         hud = next;
@@ -2562,9 +2568,9 @@ Item {
                     }
 
                     ViewSlot {
-                        active: root.showing("notification")
-                        width: root.s(root.slotSize("notification").w)
-                        height: root.s(root.slotSize("notification").h)
+                        active: root.showing("notification") || root.showing("notification-expanded")
+                        width: root.s(root.slotSize(root.view === "notification-expanded" ? "notification-expanded" : "notification").w)
+                        height: root.s(root.slotSize(root.view === "notification-expanded" ? "notification-expanded" : "notification").h)
                         NotificationView {
                             anchors.fill: parent
                             island: root
@@ -2572,9 +2578,9 @@ Item {
                     }
 
                     ViewSlot {
-                        active: root.showing("notification-actions")
-                        width: root.s(root.slotSize("notification-actions").w)
-                        height: root.s(root.slotSize("notification-actions").h)
+                        active: root.showing("notification-actions") || root.showing("notification-actions-expanded")
+                        width: root.s(root.slotSize(root.view === "notification-actions-expanded" ? "notification-actions-expanded" : "notification-actions").w)
+                        height: root.s(root.slotSize(root.view === "notification-actions-expanded" ? "notification-actions-expanded" : "notification-actions").h)
                         NotificationView {
                             anchors.fill: parent
                             island: root

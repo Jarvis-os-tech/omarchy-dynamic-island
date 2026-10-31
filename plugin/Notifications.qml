@@ -309,13 +309,25 @@ Item {
     Timer {
         id: expiry
         interval: Math.max(1000, service.durationFor(service.current))
-        running: service.current !== null && service.durationFor(service.current) > 0 && !(service.island && service.island.hovered)
+        running: service.current !== null && service.durationFor(service.current) > 0 && !(service.island && (service.island.hovered || service.island.userExpanded))
         onTriggered: if (service.current)
             service.retire(service.current.key)
     }
 
-    onCurrentChanged: if (expiry.running)
-        expiry.restart()
+    readonly property bool islandHovered: service.island ? (service.island.hovered || service.island.userExpanded) : false
+
+    onIslandHoveredChanged: {
+        if (!islandHovered && service.current !== null && service.durationFor(service.current) > 0) {
+            expiry.interval = 1500;
+            expiry.restart();
+        }
+    }
+
+    onCurrentChanged: {
+        expiry.interval = Math.max(1000, service.durationFor(service.current));
+        if (expiry.running)
+            expiry.restart();
+    }
 
     // ------------------------------------------------------------- inbox file
     // Snapshots only: after a restart the senders are gone, so restored rows

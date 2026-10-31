@@ -9,15 +9,15 @@
     },
     {
       "path": "Island.qml",
-      "sha256": "eac058e5d06881adeca200a9b216d0d74756c53aa0fd8264eaff4705a1206aff",
+      "sha256": "a1e0a75c7f9484cd22b083bf1dc226a257b35a9da25a6cce1d11927d7cb3d82a",
       "mode": 384,
-      "bytes": 105718
+      "bytes": 106183
     },
     {
       "path": "IslandModel.js",
-      "sha256": "59869cde0ef1b4718df8c555b10a984905d1f3c436b3bb852aebbd842acf0f58",
+      "sha256": "6972217f1ee21079255623b4ff9178832f8f46d834b340c82c806cd6d91eca75",
       "mode": 420,
-      "bytes": 32164
+      "bytes": 32438
     },
     {
       "path": "LICENSE",
@@ -27,9 +27,9 @@
     },
     {
       "path": "Notifications.qml",
-      "sha256": "fcd3a0812ac6ac60bac6004293e0d8e6e95ecfb41196787a58d0297ee130f453",
+      "sha256": "5a9b7258d50e16e512cca5eced3f80d9d9a5bd983ed06ba9f3b2f9129feed8a1",
       "mode": 420,
-      "bytes": 17103
+      "bytes": 17576
     },
     {
       "path": "README.md",
@@ -99,9 +99,9 @@
     },
     {
       "path": "views/BubbleContent.qml",
-      "sha256": "dbeb43bf87de0acf61a1872dae658e2751a2821ad88419894aa530ed0f4c0570",
+      "sha256": "574600e542ba2778e998124df96c3aeddd6cfab79a43ddf7a40f5d99a7925348",
       "mode": 420,
-      "bytes": 3058
+      "bytes": 3951
     },
     {
       "path": "views/CalendarCompact.qml",
@@ -207,9 +207,9 @@
     },
     {
       "path": "views/NotificationView.qml",
-      "sha256": "94828e988c812baf704d3e3c68baf2612a1cc8ff9c4af24862b7f552c2c46987",
+      "sha256": "36a7856c4c2f265fbf0acca8bdf021f6ff4bbae1d4e188940cf56b830ae55e4d",
       "mode": 420,
-      "bytes": 6196
+      "bytes": 7860
     },
     {
       "path": "views/OutputsView.qml",
