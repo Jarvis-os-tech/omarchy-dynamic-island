@@ -548,7 +548,7 @@ Item {
 
     Timer {
         id: voiceAgentSafetyTimer
-        interval: 30000
+        interval: 4000
         repeat: false
         onTriggered: {
             root.voiceAgentActive = false;
@@ -1415,7 +1415,8 @@ Item {
     // ------------------------------------------------------------------
     readonly property bool recordingActivity: showRecording && (demo && demo.recording !== undefined ? demo.recording === true : recording)
     readonly property bool mediaActivity: hasMedia && (mediaPlaying || mediaLinger || (demoMedia !== null))
-    readonly property bool micActivity: showMic && (demo && demo.mic !== undefined ? demo.mic === true : (voiceAgentActive || speechActive))
+    readonly property bool voiceAgentBusy: voiceAgentActive && (voiceAgentState === "speaking" || voiceAgentState === "thinking" || (voiceAgentState === "listening" && (speechActive || voiceLevel > 0.04)))
+    readonly property bool micActivity: showMic && (demo && demo.mic !== undefined ? demo.mic === true : (voiceAgentBusy || speechActive))
     readonly property bool inboxActivity: showInbox && inbox.length > 0
     readonly property bool timerActivity: clockSource.timerActive
     readonly property bool stopwatchActivity: clockSource.stopwatchActive

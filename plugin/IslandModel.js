@@ -179,7 +179,7 @@ function isSpeechActive(rawPeak, floor, isMuted) {
   if (isMuted) return false;
   var raw = Number(rawPeak) || 0;
   var fl = Number(floor) || 0;
-  return raw >= 0.28 && (raw - fl) >= 0.08;
+  return raw >= 0.32 && (raw - fl) >= 0.10;
 }
 
 function updateNoiseFloor(currentFloor, rawPeak, isSpeech) {

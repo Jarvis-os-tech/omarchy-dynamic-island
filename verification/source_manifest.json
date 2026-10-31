@@ -9,13 +9,13 @@
     },
     {
       "path": "Island.qml",
-      "sha256": "b0e75423cd57dc5ff7e1a5987fcb3768401efab5f06327994563e3e9fde98a25",
+      "sha256": "eac058e5d06881adeca200a9b216d0d74756c53aa0fd8264eaff4705a1206aff",
       "mode": 384,
-      "bytes": 105515
+      "bytes": 105718
     },
     {
       "path": "IslandModel.js",
-      "sha256": "25535f0570a02a6b5038613c07c191d7e49e4ca68cc7cf51145ffb58f55fbe3d",
+      "sha256": "59869cde0ef1b4718df8c555b10a984905d1f3c436b3bb852aebbd842acf0f58",
       "mode": 420,
       "bytes": 32164
     },
