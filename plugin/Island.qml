@@ -1422,18 +1422,18 @@ Item {
     readonly property bool scriptActivity: activitySource.current !== null
     readonly property bool calendarActivity: setting("calendar", true) !== false && calendarSource.soon
 
-    readonly property var activityList: Model.activities({
+    readonly property var activeTasks: Model.activities({
         recording: recordingActivity,
         media: mediaActivity,
         mic: micActivity || (setting("camera", true) !== false && cameraActive),
-        inbox: inboxActivity,
         timer: timerActivity,
         stopwatch: stopwatchActivity,
         activity: scriptActivity,
         calendar: calendarActivity
     })
-    readonly property string primary: activityList.length > 0 ? activityList[0] : ""
-    readonly property string secondary: activityList.length > 1 ? activityList[1] : ""
+    readonly property var activityList: activeTasks.concat(inboxActivity ? ["inbox"] : [])
+    readonly property string primary: activeTasks.length > 0 ? activeTasks[0] : ""
+    readonly property string secondary: activeTasks.length > 1 ? activeTasks[1] : (inboxActivity && activeTasks.length > 0 ? "inbox" : "")
 
     property bool userExpanded: false
     property string requestedSubView: "media"
@@ -1624,7 +1624,7 @@ Item {
             body: String(payload.body || ""),
             icon: String(payload.icon || ""),
             color: toneFor(payload.color),
-            duration: Number(payload.duration) || 4000
+            duration: Number(payload.duration) || 3000
         });
     }
 

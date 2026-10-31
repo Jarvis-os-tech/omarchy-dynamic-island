@@ -9,9 +9,9 @@
     },
     {
       "path": "Island.qml",
-      "sha256": "fda6509741fb3d85880463ac72486aff3e1a4db46a3abf71a1946e9d4a654199",
+      "sha256": "b0e75423cd57dc5ff7e1a5987fcb3768401efab5f06327994563e3e9fde98a25",
       "mode": 384,
-      "bytes": 105405
+      "bytes": 105515
     },
     {
       "path": "IslandModel.js",
@@ -27,9 +27,9 @@
     },
     {
       "path": "Notifications.qml",
-      "sha256": "c35e18ec8e66b928264c91278d81a7038fba8f2906535b955a9aadc24b247062",
+      "sha256": "fcd3a0812ac6ac60bac6004293e0d8e6e95ecfb41196787a58d0297ee130f453",
       "mode": 420,
-      "bytes": 13999
+      "bytes": 17103
     },
     {
       "path": "README.md",
