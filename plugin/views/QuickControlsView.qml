@@ -28,7 +28,7 @@ Item {
         return view.island && typeof view.island.f === "function" ? view.island.f(n) : n;
     }
 
-    readonly property int pad: view.s(14)
+    readonly property int pad: view.s(22)
     readonly property string fontFamily: view.island && view.island.fontFamily ? view.island.fontFamily : "sans-serif"
     readonly property string textFamily: view.island && view.island.textFamily ? view.island.textFamily : "sans-serif"
     readonly property color fg: view.island && view.island.fg ? view.island.fg : "#ffffff"
@@ -335,13 +335,13 @@ Item {
         id: mainDeck
         anchors.fill: parent
         anchors.margins: view.pad
-        spacing: view.s(10)
+        spacing: view.s(12)
 
         // 1. Header Bar: Mini Album Art, Track Title, State & View Switcher
         Item {
             id: headerBar
             width: parent.width
-            height: view.s(36)
+            height: view.s(40)
 
             Rectangle {
                 id: miniArt
@@ -383,7 +383,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    text: (view.island && (view.island.mediaTitle || view.island.trackTitle)) ? (view.island.mediaTitle || view.island.trackTitle) : "No Media Playing"
+                    text: (view.island && (view.island.mediaTitle || view.island.trackTitle)) ? (view.island.mediaTitle || view.island.trackTitle) : "Quick controls"
                     textFormat: Text.PlainText
                     renderType: Text.NativeRendering
                     elide: Text.ElideRight
@@ -395,7 +395,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    text: (view.island && view.island.mediaPlaying) ? "Now Playing" : "Idle"
+                    text: (view.island && view.island.mediaPlaying) ? "Now playing" : "Your space, fine-tuned"
                     textFormat: Text.PlainText
                     renderType: Text.NativeRendering
                     elide: Text.ElideRight
@@ -451,7 +451,7 @@ Item {
 
                         Text {
                             anchors.centerIn: parent
-                            text: "Control"
+                            text: "Controls"
                             renderType: Text.NativeRendering
                             font.family: view.textFamily
                             font.pixelSize: view.f(11)
@@ -467,14 +467,14 @@ Item {
         Rectangle {
             width: parent.width
             height: 1
-            color: "#334155"
+            color: Util.alpha(view.fg, 0.08)
         }
 
         // 2. Row 1: Network Tiles (Wi-Fi & Bluetooth)
         Row {
             id: row1
             width: parent.width
-            height: view.s(56)
+            height: view.s(60)
             spacing: view.s(8)
 
             // Wi-Fi Tile
@@ -483,7 +483,7 @@ Item {
                 width: (parent.width - parent.spacing) / 2
                 height: parent.height
                 radius: view.s(12)
-                color: wifiMouse.containsMouse ? Util.alpha(view.fg, 0.09) : Util.alpha(view.fg, 0.06)
+                color: view.wifiEnabled ? Util.alpha(view.accentColor, wifiMouse.containsMouse ? 0.24 : 0.16) : Util.alpha(view.fg, wifiMouse.containsMouse ? 0.09 : 0.04)
                 border.width: 1
                 border.color: view.wifiEnabled ? Util.alpha(view.accentColor, 0.25) : Util.alpha(view.fg, 0.08)
 
@@ -526,7 +526,7 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: !view.wifiEnabled ? "Disconnected" : (view.wifiSsid ? view.wifiSsid + " (Connected)" : "Connected")
+                            text: !view.wifiEnabled ? "Disconnected" : (view.wifiSsid ? view.wifiSsid : "Connected")
                             textFormat: Text.PlainText
                             renderType: Text.NativeRendering
                             elide: Text.ElideRight
@@ -552,7 +552,7 @@ Item {
                 width: (parent.width - parent.spacing) / 2
                 height: parent.height
                 radius: view.s(12)
-                color: btMouse.containsMouse ? Util.alpha(view.fg, 0.09) : Util.alpha(view.fg, 0.06)
+                color: view.btPowered ? Util.alpha(view.accentColor, btMouse.containsMouse ? 0.24 : 0.16) : Util.alpha(view.fg, btMouse.containsMouse ? 0.09 : 0.04)
                 border.width: 1
                 border.color: view.btPowered ? Util.alpha(view.accentColor, 0.25) : Util.alpha(view.fg, 0.08)
 
@@ -595,7 +595,7 @@ Item {
 
                         Text {
                             width: parent.width
-                            text: !view.btPowered ? "Off" : (view.connectedDeviceName ? view.connectedDeviceName : "No Devices")
+                            text: !view.btPowered ? "Off" : (view.connectedDeviceName ? view.connectedDeviceName : "Ready to connect")
                             textFormat: Text.PlainText
                             renderType: Text.NativeRendering
                             elide: Text.ElideRight
@@ -635,8 +635,11 @@ Item {
                     width: Math.max(0, Math.min(parent.width, parent.width * view.volumeFraction))
                     height: parent.height
                     radius: view.s(12)
-                    color: "#3b82f6"
-                    opacity: 0.85
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0; color: Qt.darker(view.accentColor, 1.75) }
+                        GradientStop { position: 1; color: Qt.darker(view.accentColor, 1.25) }
+                    }
 
                     Behavior on width {
                         enabled: !volumeMouse.pressed
@@ -717,8 +720,11 @@ Item {
                     width: Math.max(0, Math.min(parent.width, parent.width * view.brightnessFraction))
                     height: parent.height
                     radius: view.s(12)
-                    color: "#f59e0b"
-                    opacity: 0.85
+                    gradient: Gradient {
+                        orientation: Gradient.Horizontal
+                        GradientStop { position: 0; color: "#765126" }
+                        GradientStop { position: 1; color: "#986b30" }
+                    }
 
                     Behavior on width {
                         enabled: !brightnessMouse.pressed
@@ -1017,17 +1023,18 @@ Item {
             // FORM FACTOR Column
             Column {
                 id: formFactorCol
-                width: view.s(150)
+                width: view.s(136)
                 height: parent.height
                 spacing: view.s(4)
 
                 Text {
-                    text: "FORM FACTOR"
+                    text: "LAYOUT"
                     textFormat: Text.PlainText
                     renderType: Text.NativeRendering
                     font.family: view.textFamily
-                    font.pixelSize: view.f(10)
-                    font.weight: Font.Bold
+                    font.pixelSize: view.f(9)
+                    font.letterSpacing: 1.2
+                    font.weight: Font.DemiBold
                     color: view.fgDim
                 }
 
@@ -1106,8 +1113,9 @@ Item {
                     textFormat: Text.PlainText
                     renderType: Text.NativeRendering
                     font.family: view.textFamily
-                    font.pixelSize: view.f(10)
-                    font.weight: Font.Bold
+                    font.pixelSize: view.f(9)
+                    font.letterSpacing: 1.2
+                    font.weight: Font.DemiBold
                     color: view.fgDim
                 }
 
@@ -1149,7 +1157,9 @@ Item {
                                 width: appRow.width / 4
                                 height: appRow.height
                                 radius: view.s(8)
-                                color: appSegment.active ? Util.alpha(view.fg, 0.16) : (appMouse.containsMouse ? Util.alpha(view.fg, 0.08) : "transparent")
+                                color: appSegment.active ? Util.alpha(view.accentColor, 0.22) : (appMouse.containsMouse ? Util.alpha(view.fg, 0.08) : "transparent")
+
+                                Behavior on color { ColorAnimation { duration: 160 } }
 
                                 Text {
                                     anchors.centerIn: parent
@@ -1158,7 +1168,7 @@ Item {
                                     font.family: view.textFamily
                                     font.pixelSize: view.f(10.5)
                                     font.weight: appSegment.active ? Font.DemiBold : Font.Normal
-                                    color: appSegment.active ? view.fg : view.fgDim
+                                    color: appSegment.active ? view.accentColor : view.fgDim
                                 }
 
                                 MouseArea {

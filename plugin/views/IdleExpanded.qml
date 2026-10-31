@@ -28,8 +28,8 @@ Item {
       renderType: Text.NativeRendering
       font.family: island.fontFamily
       font.pixelSize: island.f(30)
-      font.weight: Font.Light
-      font.letterSpacing: -1
+      font.weight: Font.Normal
+      font.letterSpacing: -1.2
       font.features: { "tnum": 1 }
       color: island.fg
     }
@@ -48,7 +48,7 @@ Item {
         ? "󰃭  " + view.nextEvent.title + "  ·  " + Qt.formatDateTime(new Date(view.nextEvent.start), island.clockFormat.indexOf("AP") !== -1 ? "h:mm AP" : "HH:mm")
         : Qt.formatDateTime(clock.date, "dddd, d MMMM")
           + (island.calendar.todayAllDay.length > 0 ? "  ·  " + island.calendar.todayAllDay.join(", ") : "")
-      width: island.s(250)
+      width: Math.max(0, (island.hasBattery ? batteryCol.x : controlsBtn.x) - view.pad - island.s(12))
       elide: Text.ElideRight
       textFormat: Text.PlainText
       renderType: Text.NativeRendering
@@ -111,7 +111,7 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
     anchors.bottomMargin: island.s(16)
-    spacing: island.s(8)
+    spacing: island.s(6)
 
     Repeater {
       model: [
@@ -125,12 +125,14 @@ Item {
       Rectangle {
         id: chip
         required property var modelData
-        height: island.s(30)
-        width: chipLabel.implicitWidth + island.s(22)
-        radius: height / 2
+        height: island.s(34)
+        width: chipLabel.implicitWidth + island.s(18)
+        radius: island.s(12)
         color: Util.alpha(chip.modelData.seconds > 0 ? island.orangeColor : island.accentColor,
                           chipMouse.pressed ? 0.3 : (chipMouse.containsMouse ? 0.22 : 0.14))
-        scale: chipMouse.pressed ? 0.94 : 1
+        border.width: 1
+        border.color: Util.alpha(chip.modelData.seconds > 0 ? island.orangeColor : island.accentColor, chipMouse.containsMouse ? 0.4 : 0.18)
+        scale: chipMouse.pressed ? 0.94 : (chipMouse.containsMouse ? 1.025 : 1)
 
         Behavior on scale { NumberAnimation { duration: 120 } }
         Behavior on color { ColorAnimation { duration: 120 } }

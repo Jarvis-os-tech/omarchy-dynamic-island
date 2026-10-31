@@ -52,7 +52,7 @@ Item {
   Shape {
     anchors.fill: parent
     visible: washSource.status === Image.Ready
-    opacity: 0.42
+    opacity: 0.32
     preferredRendererType: Shape.CurveRenderer
 
     ShapePath {
@@ -85,6 +85,7 @@ Item {
     anchors.right: parent.right
     anchors.rightMargin: view.pad - island.s(4)
     anchors.verticalCenter: art.verticalCenter
+    accessibleName: "Quick controls"
     glyph: "󰘳"
     glyphSize: island.f(17)
     color: island.fgDim
@@ -202,8 +203,8 @@ Item {
           width: Math.max(view.progress > 0 ? height : 0, parent.width * view.progress)
           gradient: Gradient {
             orientation: Gradient.Horizontal
-            GradientStop { position: 0; color: Util.alpha(island.fg, 0.55) }
-            GradientStop { position: 1; color: island.fg }
+            GradientStop { position: 0; color: Util.alpha(island.mediaTint, 0.6) }
+            GradientStop { position: 1; color: island.mediaTint }
           }
         }
 
@@ -255,6 +256,7 @@ Item {
 
     IconButton {
       anchors.verticalCenter: parent.verticalCenter
+      accessibleName: "Previous track"
       glyph: "󰒮"
       glyphSize: island.f(22)
       color: island.fg
@@ -296,6 +298,7 @@ Item {
 
     IconButton {
       anchors.verticalCenter: parent.verticalCenter
+      accessibleName: "Next track"
       glyph: "󰒭"
       glyphSize: island.f(22)
       color: island.fg

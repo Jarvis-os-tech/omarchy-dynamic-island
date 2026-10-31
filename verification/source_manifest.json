@@ -9,15 +9,15 @@
     },
     {
       "path": "Island.qml",
-      "sha256": "81b11b6aefe6745a5111e69bb85343e503edb024f68d7fcc0bfbb8ea7e1ce528",
-      "mode": 420,
-      "bytes": 103630
+      "sha256": "c08326d2f12e51f9e2c9a26cff6a8b4bb962a590045ea973c17d8592ac492821",
+      "mode": 384,
+      "bytes": 105387
     },
     {
       "path": "IslandModel.js",
-      "sha256": "fb7908cee386c540c661ee028434f6ac11e94a23ce9c142232397268cb2623f3",
+      "sha256": "25535f0570a02a6b5038613c07c191d7e49e4ca68cc7cf51145ffb58f55fbe3d",
       "mode": 420,
-      "bytes": 27754
+      "bytes": 32164
     },
     {
       "path": "LICENSE",
@@ -153,15 +153,15 @@
     },
     {
       "path": "views/IconButton.qml",
-      "sha256": "780b8d5231f27bf88af8f301fbc893e1d906e885af25365ec03311baef0deb5f",
+      "sha256": "c40da2d23e36d8e5054dcf21055a4415f8bfeab3032d9c83de0e4b07ee803c25",
       "mode": 420,
-      "bytes": 1233
+      "bytes": 1667
     },
     {
       "path": "views/IdleExpanded.qml",
-      "sha256": "2e5a17659e050c398b513f35c6a16c4f68cd9c877a2103d7b5ddc0ed448a07ee",
+      "sha256": "4af1c21fc60bd405ad224aa0441edba1212c0278b6bdf594d49c913a01d64838",
       "mode": 420,
-      "bytes": 5316
+      "bytes": 5598
     },
     {
       "path": "views/IdleFace.qml",
@@ -195,9 +195,9 @@
     },
     {
       "path": "views/MediaExpanded.qml",
-      "sha256": "c6eb962c920270638f4196f6a491c3f09082d389bb986932418cd8f4d9f171d8",
+      "sha256": "1fe562ef58596a28ca1c175fd97382f1c09ab1ee848fa063552ff1e915db6427",
       "mode": 420,
-      "bytes": 8451
+      "bytes": 8575
     },
     {
       "path": "views/MicCompact.qml",
@@ -225,9 +225,9 @@
     },
     {
       "path": "views/QuickControlsView.qml",
-      "sha256": "a5d2621332ee49e7bcb91a1df8d98f23f690946283a04a4f71621310a51d4e17",
+      "sha256": "abd7378fe447a85137d63b10c6f8437009a10d9fd444e523b7258ec3f6d8e6c5",
       "mode": 420,
-      "bytes": 45103
+      "bytes": 45882
     },
     {
       "path": "views/RecordDot.qml",
@@ -273,9 +273,9 @@
     },
     {
       "path": "views/VoiceWaveform.qml",
-      "sha256": "2957aa44214c0245dd041ffb7e56b34bd474764970c712875c58aa5ad6e8d7b6",
+      "sha256": "d17d0e134a529854db48f832cf6980dfbb9af4323907293cc8269927000e3364",
       "mode": 420,
-      "bytes": 4469
+      "bytes": 4837
     }
   ]
 }

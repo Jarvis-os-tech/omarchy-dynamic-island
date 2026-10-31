@@ -15,6 +15,9 @@ Row {
     property real minHeight: island ? island.s(3.5) : 3.5
     property color overrideColor: "transparent"
 
+    property real audioLevel: island && island.voiceLevel !== undefined ? island.voiceLevel : 0.0
+    property bool isDemo: !!(island && island.demo && island.demo.mic !== undefined)
+
     readonly property var siriPalette: ["#38bdf8" // 0: electric sky
         , "#60a5fa" // 1: vibrant blue
         , "#818cf8" // 2: soft indigo
@@ -112,10 +115,15 @@ Row {
                     var bell = 1.0 - Math.pow((i - (n - 1) / 2) / (n / 1.8), 2);
                     item.level = Math.max(0.2, Math.min(1.0, (0.3 + 0.7 * rnd) * bell));
                 } else {
-                    // Listening: lively undulating organic acoustic wave
-                    var waveVal = (Math.sin(wave.phase + i * 0.9) + 1.0) / 2.0;
-                    var noise = (Math.random() - 0.5) * 0.35;
-                    item.level = Math.max(0.18, Math.min(1.0, waveVal * 0.75 + 0.15 + noise));
+                    // Listening: only react to actual voice level
+                    var v = wave.isDemo ? 0.65 : wave.audioLevel;
+                    if (v <= 0.02) {
+                        item.level = 0.0;
+                    } else {
+                        var waveVal = (Math.sin(wave.phase + i * 1.1) + 1.0) / 2.0;
+                        var variance = 0.6 + 0.4 * waveVal;
+                        item.level = Math.max(0.12, Math.min(1.0, v * variance * 1.3));
+                    }
                 }
             }
         }

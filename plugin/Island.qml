@@ -174,33 +174,33 @@ Item {
 
     readonly property color surface: blackBackground ? "#000000" : Color.background
     readonly property color fg: (blackBackground || root.appearance !== "theme") ? "#f5f5f7" : Color.foreground
-    readonly property color fgDim: Util.alpha(fg, 0.6)
+    readonly property color fgDim: Util.alpha(fg, 0.66)
     readonly property color accentColor: Color.accent
     readonly property color urgentColor: Color.urgent
     readonly property color greenColor: themeColors.color2 || Color.accent
     readonly property color orangeColor: themeColors.color3 || Color.urgent
     readonly property color outline: (blackBackground || root.appearance !== "theme") ? "transparent" : Util.alpha(Color.foreground, 0.1)
     // Surface gradients & rim highlights:
-    // "glass": translucent slate (#e02a2e39 / #f014171f), rim #475569
+    // "glass": smoked blue glass with a quiet, translucent rim
     // "black": OLED black (#fa05070a / #fc05070a), rim #1f242d
     // "graphite": matte slate (#f21c1f26 / #f21c1f26), rim #2d3340
     // "theme": dynamic system theme tokens
     readonly property color surfaceTop: {
         if (root.appearance === "glass")
-            return "#e02a2e39";
+            return "#ee252b38";
         if (root.appearance === "black")
             return "#fa05070a";
         if (root.appearance === "graphite")
-            return "#f21c1f26";
+            return "#f21c2029";
         return Qt.tint(surface, Util.alpha(Color.foreground, blackBackground ? 0.05 : 0.055));
     }
     readonly property color surfaceBottom: {
         if (root.appearance === "glass")
-            return "#f014171f";
+            return "#f510141d";
         if (root.appearance === "black")
             return "#fc05070a";
         if (root.appearance === "graphite")
-            return "#f21c1f26";
+            return "#f21c2029";
         return blackBackground ? "#000000" : Qt.darker(surface, 1.28);
     }
     function bodyAt(t) {
@@ -209,7 +209,7 @@ Item {
     }
     readonly property color rim: {
         if (root.appearance === "glass")
-            return "#475569";
+            return Util.alpha("#c3d5f0", 0.22);
         if (root.appearance === "black")
             return "#1f242d";
         if (root.appearance === "graphite")
@@ -493,14 +493,77 @@ Item {
         }
     }
 
+    PwNodePeakMonitor {
+        id: micPeakMonitor
+        node: Pipewire.defaultAudioSource
+        enabled: root.showMic && !root.micMuted
+    }
+
+    property real micFloor: 0.20
+    property bool speechActive: false
+
+    readonly property real micRawPeak: (micPeakMonitor.node && !root.micMuted) ? micPeakMonitor.peak : 0.0
+    readonly property real voiceLevel: Model.normalizeVoiceLevel(root.micRawPeak, root.micFloor)
+
+    Timer {
+        id: speechDecayTimer
+        interval: 1200
+        repeat: false
+        onTriggered: {
+            root.speechActive = false;
+        }
+    }
+
+    onMicRawPeakChanged: {
+        if (root.micMuted) {
+            root.speechActive = false;
+            speechDecayTimer.stop();
+            return;
+        }
+        var active = Model.isSpeechActive(root.micRawPeak, root.micFloor, root.micMuted);
+        if (active) {
+            root.speechActive = true;
+            speechDecayTimer.restart();
+        }
+    }
+
+    onMicMutedChanged: {
+        if (root.micMuted) {
+            root.speechActive = false;
+            speechDecayTimer.stop();
+        }
+    }
+
+    Timer {
+        interval: 1000
+        repeat: true
+        running: root.showMic && !root.micMuted
+        onTriggered: {
+            root.micFloor = Model.updateNoiseFloor(root.micFloor, root.micRawPeak, root.speechActive);
+        }
+    }
+
     property bool voiceAgentActive: false
     property string voiceAgentState: "listening"
+
+    Timer {
+        id: voiceAgentSafetyTimer
+        interval: 30000
+        repeat: false
+        onTriggered: {
+            root.voiceAgentActive = false;
+            root.voiceAgentState = "idle";
+        }
+    }
+
     readonly property string activeVoiceState: {
         if (demo && demo.voiceState)
             return demo.voiceState;
-        if (voiceAgentState)
+        if (voiceAgentActive && voiceAgentState)
             return voiceAgentState;
-        return "listening";
+        if (speechActive)
+            return "listening";
+        return "idle";
     }
 
     // ------------------------------------------------------------------
@@ -1352,7 +1415,7 @@ Item {
     // ------------------------------------------------------------------
     readonly property bool recordingActivity: showRecording && (demo && demo.recording !== undefined ? demo.recording === true : recording)
     readonly property bool mediaActivity: hasMedia && (mediaPlaying || mediaLinger || (demoMedia !== null))
-    readonly property bool micActivity: showMic && (demo && demo.mic !== undefined ? demo.mic === true : (micActive || voiceAgentActive))
+    readonly property bool micActivity: showMic && (demo && demo.mic !== undefined ? demo.mic === true : voiceAgentActive)
     readonly property bool inboxActivity: showInbox && inbox.length > 0
     readonly property bool timerActivity: clockSource.timerActive
     readonly property bool stopwatchActivity: clockSource.stopwatchActive
@@ -1898,15 +1961,17 @@ Item {
                 root.clocks.toggleStopwatch();
             return "ok";
         }
-        // Voice agent state: "listening" | "thinking" | "speaking" | "off"
+        // Voice agent state: "listening" | "thinking" | "speaking" | "off" | "idle"
         function voice(state: string): string {
             var s = String(state || "listening").toLowerCase();
-            if (s === "off" || s === "stop") {
+            if (s === "off" || s === "stop" || s === "idle") {
                 root.voiceAgentActive = false;
-                root.voiceAgentState = "listening";
+                root.voiceAgentState = "idle";
+                voiceAgentSafetyTimer.stop();
             } else {
                 root.voiceAgentActive = true;
                 root.voiceAgentState = s;
+                voiceAgentSafetyTimer.restart();
             }
             return "ok";
         }

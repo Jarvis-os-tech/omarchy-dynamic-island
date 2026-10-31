@@ -31,7 +31,8 @@ var sizes = {
   "activity-expanded": { w: 392, h: 104, r: 38 },
   "calendar-expanded": { w: 500, h: 262, r: 40 },
   "notification-actions": { w: 404, h: 118, r: 38 },
-  "controls":      { w: 440, h: 380, r: 34 }
+  "controls":      { w: 440, h: 380, r: 34 },
+  "aifleet":       { w: 440, h: 380, r: 34 }
 }
 
 // Compact activities in priority order. The first one present owns the pill;
@@ -101,6 +102,7 @@ function sizeFor(view, counts, notch) {
   if (view === "inbox-expanded") base = inboxSize(counts && counts.inbox || 0)
   else if (view === "outputs-expanded") base = outputsSize(counts && counts.outputs || 0)
   else if (view === "controls") base = sizes["controls"]
+  else if (view === "aifleet") base = sizes["aifleet"]
   else base = sizes[view] || sizes["idle"]
   if (!notch || !(notch.w > 0) || compactViews.indexOf(view) === -1) return base
   var h = Math.max(base.h, notch.h > 0 ? notch.h : base.h)
@@ -163,6 +165,31 @@ function clampBrightness(fraction) {
   var v = Number(fraction);
   if (isNaN(v)) return 0.01;
   return Math.max(0.01, Math.min(1.0, v));
+}
+
+function normalizeVoiceLevel(rawPeak, floor) {
+  var raw = Number(rawPeak) || 0;
+  var fl = Number(floor) || 0;
+  var diff = raw - fl;
+  if (diff <= 0.02) return 0.0;
+  return Math.max(0.0, Math.min(1.0, (diff - 0.02) / 0.35));
+}
+
+function isSpeechActive(rawPeak, floor, isMuted) {
+  if (isMuted) return false;
+  var raw = Number(rawPeak) || 0;
+  var fl = Number(floor) || 0;
+  return raw >= 0.28 && (raw - fl) >= 0.08;
+}
+
+function updateNoiseFloor(currentFloor, rawPeak, isSpeech) {
+  var raw = Number(rawPeak) || 0;
+  var fl = Number(currentFloor) || 0;
+  if (fl <= 0) fl = raw > 0 ? raw : 0.20;
+  if (isSpeech) return fl;
+  if (raw <= 0.01 || raw > 0.35) return fl;
+  if (raw < fl) return fl * 0.7 + raw * 0.3;
+  return fl * 0.96 + raw * 0.04;
 }
 
 // Bluetooth device icon names (freedesktop) -> Nerd Font glyph.
@@ -711,3 +738,113 @@ function parseKeybind(text) {
   }
   return { mask: mask, key: parts[parts.length - 1] }
 }
+
+// Synchronized lyrics (LRC format) parser.
+// Parses [MM:SS.xx] lyrics into an array of { time: float, text: string } sorted by time.
+function parseLrc(lrcText) {
+  if (!lrcText) return []
+  var lines = String(lrcText).split(/\r?\n/)
+  var result = []
+  var tagRegex = /\[(\d{1,2}):(\d{2}(?:\.\d+)?)\]/g
+  for (var i = 0; i < lines.length; i++) {
+    var rawLine = lines[i]
+    var line = rawLine.trim()
+    if (!line) continue
+    var matches = []
+    var m
+    while ((m = tagRegex.exec(line)) !== null) {
+      var mins = parseInt(m[1], 10)
+      var secs = parseFloat(m[2])
+      matches.push(mins * 60 + secs)
+    }
+    if (matches.length > 0) {
+      var text = line.replace(/\[\d{1,2}:\d{2}(?:\.\d+)?\]/g, "").trim()
+      for (var j = 0; j < matches.length; j++) {
+        result.push({ time: Math.round(matches[j] * 100) / 100, text: text })
+      }
+    }
+  }
+  result.sort(function(a, b) { return a.time - b.time })
+  return result
+}
+
+// Returns the index of the active LRC line at currentSeconds, clamped to [0, lines.length - 1].
+function findActiveLrcIndex(lines, currentSeconds) {
+  if (!lines || lines.length === 0) return 0
+  var sec = Number(currentSeconds) || 0
+  if (sec <= lines[0].time) return 0
+  if (sec >= lines[lines.length - 1].time) return lines.length - 1
+  var low = 0
+  var high = lines.length - 1
+  var active = 0
+  while (low <= high) {
+    var mid = Math.floor((low + high) / 2)
+    if (lines[mid].time <= sec) {
+      active = mid
+      low = mid + 1
+    } else {
+      high = mid - 1
+    }
+  }
+  return active
+}
+
+// Parses brain-who tabular output into structured fleet agent records.
+function parseBrainWho(rawOutput) {
+  if (!rawOutput) return []
+  var lines = String(rawOutput).split(/\r?\n/)
+  var fleet = []
+  var statusCol = -1, lastActiveCol = -1, doingCol = -1
+  for (var i = 0; i < lines.length; i++) {
+    var rawLine = lines[i]
+    var line = rawLine.trim()
+    if (!line) continue
+    if (/^agent\b/i.test(line)) {
+      statusCol = rawLine.indexOf("status")
+      lastActiveCol = rawLine.indexOf("last active")
+      doingCol = rawLine.indexOf("doing")
+      continue
+    }
+    var agent = "", status = "", lastActive = "", doing = ""
+    if (statusCol !== -1 && lastActiveCol !== -1 && doingCol !== -1 && rawLine.length >= statusCol) {
+      agent = rawLine.slice(0, statusCol).trim()
+      status = rawLine.slice(statusCol, lastActiveCol).trim()
+      lastActive = rawLine.slice(lastActiveCol, doingCol).trim()
+      doing = rawLine.length > doingCol ? rawLine.slice(doingCol).trim() : ""
+    } else {
+      var parts = line.split(/\s{2,}/)
+      if (parts.length >= 3) {
+        agent = parts[0].trim()
+        status = parts[1].trim()
+        lastActive = parts[2].trim()
+        doing = parts.slice(3).join("  ").trim()
+      } else {
+        var m = line.match(/^(\S+)\s+(\S+)\s+(now|\d+[smhd]\s+ago|never|\S+)(?:\s+(.*))?$/)
+        if (m) {
+          agent = m[1]
+          status = m[2]
+          lastActive = m[3]
+          doing = m[4] ? m[4].trim() : ""
+        }
+      }
+    }
+    if (agent && agent.toLowerCase() !== "agent") {
+      var isWorking = status.toUpperCase() === "WORKING"
+      fleet.push({
+        agent: agent,
+        status: status,
+        lastActive: lastActive,
+        doing: doing,
+        isWorking: isWorking
+      })
+    }
+  }
+  return fleet
+}
+
+// Parses duration strings (e.g., "15m", "1h", "30s", "18:30") into milliseconds.
+function parseReminderDuration(str) {
+  if (typeof str === "number") return Math.max(0, Math.round(str))
+  return parseDuration(str) * 1000
+}
+

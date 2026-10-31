@@ -103,6 +103,23 @@ assert.equal(clampBrightness(1.0), 1.0);
 assert.equal(clampBrightness(1.5), 1.0);
 assert.equal(clampBrightness("invalid"), 0.01);
 
+// Test voice level normalization above noise floor
+assert.equal(normalizeVoiceLevel(0.16, 0.16), 0.0);
+assert.equal(normalizeVoiceLevel(0.17, 0.16), 0.0);
+assert.equal(Math.round(normalizeVoiceLevel(0.35, 0.16) * 100), 49);
+assert.equal(normalizeVoiceLevel(0.80, 0.16), 1.0);
+
+// Test speech detection above noise floor
+assert.equal(isSpeechActive(0.20, 0.20, false), false);
+assert.equal(isSpeechActive(0.25, 0.20, false), false);
+assert.equal(isSpeechActive(0.50, 0.20, false), true);
+assert.equal(isSpeechActive(0.50, 0.20, true), false);
+
+// Test noise floor tracking
+assert.equal(updateNoiseFloor(0.20, 0.50, true), 0.20);
+assert.equal(updateNoiseFloor(0.20, 0.0, false), 0.20);
+assert.equal(normalizeVoiceLevel(0, 0.16), 0.0);
+
 console.log('quick controls model helpers passed');
 '''
     result = subprocess.run(['/usr/bin/node', '-e', source + '\n' + assertions], capture_output=True, text=True, timeout=15)
@@ -118,3 +135,49 @@ def test_existing_screen_recovery_regressions_offscreen(tmp_path):
                           env=env,capture_output=True,text=True,timeout=25)
     (ROOT/'verification/screen_recovery.log').write_text(result.stdout+result.stderr)
     assert result.returncode == 0,result.stdout+result.stderr
+
+def test_subproject3_model_helpers():
+    source = (PLUGIN/'IslandModel.js').read_text().replace('.pragma library','',1)
+    assertions = r'''
+const assert = require('node:assert/strict');
+
+// 1. LRC parser
+const lrc = "[00:04.50]Line one\n[00:12.00]Line two\n[01:05.25]Line three";
+const lines = parseLrc(lrc);
+assert.equal(lines.length, 3);
+assert.equal(lines[0].time, 4.5);
+assert.equal(lines[0].text, "Line one");
+assert.equal(lines[1].time, 12.0);
+assert.equal(lines[2].time, 65.25);
+
+// 2. Active LRC index
+assert.equal(findActiveLrcIndex(lines, 0), 0);
+assert.equal(findActiveLrcIndex(lines, 8.0), 0);
+assert.equal(findActiveLrcIndex(lines, 12.0), 1);
+assert.equal(findActiveLrcIndex(lines, 30.0), 1);
+assert.equal(findActiveLrcIndex(lines, 70.0), 2);
+
+// 3. brain-who parser
+const rawWho = `agent     status    last active  doing
+opencode  idle      16h ago      chat session
+codex     WORKING   now          Writing tests
+claude    idle      5d ago       [interrupted]
+`;
+const fleet = parseBrainWho(rawWho);
+assert.equal(fleet.length, 3);
+assert.equal(fleet[1].agent, "codex");
+assert.equal(fleet[1].isWorking, true);
+assert.equal(fleet[1].doing, "Writing tests");
+assert.equal(fleet[0].isWorking, false);
+
+// 4. Reminder duration parser
+assert.equal(parseReminderDuration("15m"), 15 * 60 * 1000);
+assert.equal(parseReminderDuration("1h"), 60 * 60 * 1000);
+assert.equal(parseReminderDuration("30s"), 30 * 1000);
+
+// 5. aifleet sizing
+assert.deepEqual(sizeFor("aifleet", {}, {w:0,h:0,r:0}), { w: 440, h: 380, r: 34 });
+'''
+    result = subprocess.run(['/usr/bin/node', '-e', source + '\n' + assertions], capture_output=True, text=True, timeout=15)
+    assert result.returncode == 0, result.stderr
+
