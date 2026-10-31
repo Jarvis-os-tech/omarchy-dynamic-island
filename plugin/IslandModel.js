@@ -163,6 +163,28 @@ function formatCallDuration(totalSeconds) {
   return pad(mins) + ":" + pad(secs);
 }
 
+// Parse /proc/meminfo into used/total RAM and percentage.
+function parseMeminfo(text) {
+  var total = 0, avail = 0;
+  var lines = String(text || "").split("\n");
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    if (line.indexOf("MemTotal:") === 0) {
+      total = parseInt(line.replace(/[^0-9]/g, ""), 10);
+    } else if (line.indexOf("MemAvailable:") === 0) {
+      avail = parseInt(line.replace(/[^0-9]/g, ""), 10);
+    }
+    if (total > 0 && avail > 0) break;
+  }
+  if (total <= 0) return { totalGb: 0, usedGb: 0, percent: 0 };
+  var used = Math.max(0, total - avail);
+  return {
+    totalGb: Math.round((total / 1048576) * 10) / 10,
+    usedGb: Math.round((used / 1048576) * 10) / 10,
+    percent: Math.max(0, Math.min(1, used / total))
+  };
+}
+
 function validAppearance(name) {
   return ["glass", "black", "graphite", "theme"].indexOf(name) !== -1;
 }
@@ -722,7 +744,8 @@ var defaultSettings = {
   charging: true,
   trackChange: true,
   recording: true,
-  mic: true
+  mic: true,
+  ram: true
 }
 
 function missingSettings(settings) {

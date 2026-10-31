@@ -9,15 +9,15 @@
     },
     {
       "path": "Island.qml",
-      "sha256": "a1e0a75c7f9484cd22b083bf1dc226a257b35a9da25a6cce1d11927d7cb3d82a",
-      "mode": 384,
-      "bytes": 106183
+      "sha256": "33aa26fe4ca5689f0c2f47bc07ee2f8287d9238c0da049e2a8f4f870acfefc27",
+      "mode": 420,
+      "bytes": 107860
     },
     {
       "path": "IslandModel.js",
-      "sha256": "6972217f1ee21079255623b4ff9178832f8f46d834b340c82c806cd6d91eca75",
+      "sha256": "7d52dcf67f34f4c341fe66600296ea9fd1bd7b6fe8c0cd0a7470295bcf3c5ca1",
       "mode": 420,
-      "bytes": 32438
+      "bytes": 33224
     },
     {
       "path": "LICENSE",
@@ -159,9 +159,9 @@
     },
     {
       "path": "views/IdleExpanded.qml",
-      "sha256": "4af1c21fc60bd405ad224aa0441edba1212c0278b6bdf594d49c913a01d64838",
+      "sha256": "8fbe1d5cc6418bfeb2f796ed9ccc7aa05956d333bb6493e8643c087c18333a64",
       "mode": 420,
-      "bytes": 5598
+      "bytes": 8320
     },
     {
       "path": "views/IdleFace.qml",

@@ -120,6 +120,15 @@ assert.equal(updateNoiseFloor(0.20, 0.50, true), 0.20);
 assert.equal(updateNoiseFloor(0.20, 0.0, false), 0.20);
 assert.equal(normalizeVoiceLevel(0, 0.16), 0.0);
 
+// Test meminfo parser
+const memSample = "MemTotal:       32654316 kB\nMemFree:         4123456 kB\nMemAvailable:   16327158 kB\nBuffers:          500000 kB";
+const memInfo = parseMeminfo(memSample);
+assert.equal(memInfo.totalGb, 31.1);
+assert.equal(memInfo.usedGb, 15.6);
+assert.equal(Math.round(memInfo.percent * 100), 50);
+assert.deepEqual(parseMeminfo(""), { totalGb: 0, usedGb: 0, percent: 0 });
+assert.deepEqual(parseMeminfo(null), { totalGb: 0, usedGb: 0, percent: 0 });
+
 console.log('quick controls model helpers passed');
 '''
     result = subprocess.run(['/usr/bin/node', '-e', source + '\n' + assertions], capture_output=True, text=True, timeout=15)

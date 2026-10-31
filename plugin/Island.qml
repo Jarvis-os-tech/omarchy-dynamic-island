@@ -59,6 +59,7 @@ Item {
     readonly property bool showTrackChange: setting("trackChange", true) !== false
     readonly property bool showRecording: setting("recording", true) !== false
     readonly property bool showMic: setting("mic", true) !== false
+    readonly property bool showRam: setting("ram", true) !== false
     // Match a real display cutout (MacBook notch): its size in pixels.
     readonly property var notchSize: ({
             w: Math.max(0, Number(setting("notchWidth", 0)) || 0),
@@ -67,7 +68,7 @@ Item {
         })
     readonly property string idleFace: {
         var f = String(setting("idleFace", "ticker"));
-        return ["ticker", "clock", "lens", "none"].indexOf(f) !== -1 ? f : "ticker";
+        return ["ticker", "clock", "lens", "ram", "none"].indexOf(f) !== -1 ? f : "ticker";
     }
     readonly property bool artworkTint: setting("visualizerColor", "accent") === "artwork"
     readonly property bool glowEnabled: setting("glow", false) === true
@@ -607,6 +608,35 @@ Item {
             color: urgentColor,
             duration: 3500
         });
+    }
+
+    // ------------------------------------------------------------------
+    // Memory (RAM) monitoring via /proc/meminfo
+    // ------------------------------------------------------------------
+    property var ramInfo: ({
+            totalGb: 0,
+            usedGb: 0,
+            percent: 0
+        })
+    readonly property real ramUsage: ramInfo.percent
+    readonly property real ramUsedGb: ramInfo.usedGb
+    readonly property real ramTotalGb: ramInfo.totalGb
+
+    FileView {
+        id: meminfoFile
+        path: "/proc/meminfo"
+        printErrors: false
+        onLoaded: {
+            root.ramInfo = Model.parseMeminfo(text());
+        }
+    }
+
+    Timer {
+        interval: 3000
+        repeat: true
+        running: root.showRam
+        triggeredOnStart: true
+        onTriggered: meminfoFile.reload()
     }
 
     // ------------------------------------------------------------------
@@ -1255,6 +1285,14 @@ Item {
         // Qt only gives 12-hour "h" when AM/PM is in the same format, so format
         // with it and drop the suffix: "10:57", not "22:57".
         var time = ampm ? Qt.formatDateTime(idleClock.date, "h:mm AP").replace(/\s*[AaPp][Mm]$/, "") : Qt.formatDateTime(idleClock.date, "HH:mm");
+        if (idleFace === "ram") {
+            items.push({
+                key: "ram",
+                text: "󰍛 " + Math.round(ramUsage * 100) + "%",
+                color: ramUsage >= 0.85 ? urgentColor : (ramUsage >= 0.70 ? orangeColor : "")
+            });
+            return items;
+        }
         items.push({
             key: "time",
             text: time
@@ -1270,6 +1308,12 @@ Item {
                 key: "battery",
                 text: Model.batteryIcon(batteryLevel, charging) + " " + Model.percentText(batteryLevel),
                 color: charging ? greenColor : (batteryLevel <= 0.2 ? urgentColor : "")
+            });
+        if (showRam && ramUsage > 0)
+            items.push({
+                key: "ram",
+                text: "󰍛 " + Math.round(ramUsage * 100) + "%",
+                color: ramUsage >= 0.85 ? urgentColor : (ramUsage >= 0.70 ? orangeColor : "")
             });
         var next = calendar.next;
         if (next && next.start - idleClock.date.getTime() < 12 * 3600000 && next.start > idleClock.date.getTime())
@@ -2036,6 +2080,11 @@ Item {
                 recording: root.recordingActivity,
                 mic: root.micActivity,
                 battery: root.hasBattery ? Math.round(root.batteryLevel * 100) : null,
+                ram: root.showRam ? {
+                    percent: Math.round(root.ramUsage * 100),
+                    usedGb: root.ramUsedGb,
+                    totalGb: root.ramTotalGb
+                } : null,
                 brightness: root.brightness,
                 timer: root.clocks.timerActive ? Math.ceil(root.clocks.timerLeft / 1000) : null,
                 stopwatch: root.clocks.stopwatchActive ? Math.round(root.clocks.stopwatchElapsed / 100) / 10 : null,
