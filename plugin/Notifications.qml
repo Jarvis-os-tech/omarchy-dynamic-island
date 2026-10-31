@@ -35,7 +35,7 @@ Item {
     property var banners: []
     property var inbox: []
     readonly property var current: banners.length > 0 ? banners[0] : null
-    readonly property int pending: Math.max(0, banners.length - 1)
+    readonly property int pending: inbox.length
     property bool doNotDisturb: false
     property int serial: 0
     property bool tearingDown: false
@@ -92,7 +92,18 @@ Item {
                 addToInbox(entry);
             return;
         }
-        banners = [entry].concat(banners);
+
+        // Retire any previous active banner into the inbox (or expire if ephemeral)
+        // so we never trap the island in an endless sequential banner train.
+        for (var i = 0; i < banners.length; i++) {
+            var old = banners[i];
+            if (Model.isEphemeralApp(old.app)) {
+                remove(old.key, "expire");
+            } else {
+                addToInbox(old);
+            }
+        }
+        banners = [entry];
     }
 
     function snapshot(n) {
@@ -132,25 +143,32 @@ Item {
     // Demo / testing: a notification with no live sender.
     function inject(fields) {
         serial += 1;
-        banners = [
-            {
-                key: serial,
-                ref: null,
-                app: fields.app || "",
-                appIcon: fields.appIcon || "",
-                desktopEntry: "",
-                summary: fields.summary || "",
-                body: fields.body || "",
-                image: fields.image || "",
-                glyph: fields.glyph || "",
-                execArgv: "",
-                critical: fields.critical === true,
-                low: false,
-                timeout: 0,
-                actions: fields.actions || [],
-                time: Date.now()
+        var entry = {
+            key: serial,
+            ref: null,
+            app: fields.app || "",
+            appIcon: fields.appIcon || "",
+            desktopEntry: "",
+            summary: fields.summary || "",
+            body: fields.body || "",
+            image: fields.image || "",
+            glyph: fields.glyph || "",
+            execArgv: "",
+            critical: fields.critical === true,
+            low: false,
+            timeout: 0,
+            actions: fields.actions || [],
+            time: Date.now()
+        };
+        for (var i = 0; i < banners.length; i++) {
+            var old = banners[i];
+            if (Model.isEphemeralApp(old.app)) {
+                remove(old.key, "expire");
+            } else {
+                addToInbox(old);
             }
-        ].concat(banners);
+        }
+        banners = [entry];
     }
 
     // Omarchy's rule: its own action toasts, and bare `notify-send` criticals.
